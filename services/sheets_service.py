@@ -4,10 +4,21 @@ from config.settings import SCOPES, CREDENTIALS_FILE, SPREADSHEET_NAME
 
 class SheetsService:
     def __init__(self):
-        """Initialize Google Sheets connection"""
+    """Initialize Google Sheets connection"""
+    import os
+    import json
+    
+    # Check if running in production (Railway) or locally
+    if os.getenv('GOOGLE_CREDENTIALS'):
+        # Production: use environment variable
+        creds_dict = json.loads(os.getenv('GOOGLE_CREDENTIALS'))
+        self.creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
+    else:
+        # Local: use credentials.json file
         self.creds = Credentials.from_service_account_file(CREDENTIALS_FILE, scopes=SCOPES)
-        self.client = gspread.authorize(self.creds)
-        self.spreadsheet = self.client.open(SPREADSHEET_NAME)
+    
+    self.client = gspread.authorize(self.creds)
+    self.spreadsheet = self.client.open(SPREADSHEET_NAME)
     
     def get_sheet(self, sheet_name):
         """Get a specific worksheet by name"""

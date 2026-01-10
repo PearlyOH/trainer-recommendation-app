@@ -33,5 +33,29 @@ class SheetsService:
         import pandas as pd
         sheet = self.get_sheet(sheet_name)
         
-        # Get all values to handle potential duplicate headers
-        all
+        # Get all values
+        all_values = sheet.get_all_values()
+        
+        if not all_values:
+            return pd.DataFrame()
+        
+        # First row is headers, rest is data
+        headers = all_values[0]
+        data = all_values[1:]
+        
+        return pd.DataFrame(data, columns=headers)
+    
+    def write_dataframe(self, sheet_name, df):
+        """Write a pandas DataFrame to a sheet"""
+        sheet = self.get_sheet(sheet_name)
+        
+        # Clear existing content
+        sheet.clear()
+        
+        # Write headers and data
+        headers = df.columns.tolist()
+        values = df.values.tolist()
+        
+        sheet.append_row(headers)
+        for row in values:
+            sheet.append_row(row)

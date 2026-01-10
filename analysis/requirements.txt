@@ -1,6 +1,0 @@
-fastapi==0.115.5
-uvicorn==0.32.1
-gspread==6.1.4
-pandas==2.2.3
-google-auth==2.37.0
-oauth2client==4.1.3

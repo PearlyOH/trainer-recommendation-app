@@ -41,11 +41,11 @@ def run_all_analyses():
         print()
         
         print("=" * 50)
-        print("✅ ALL ANALYSES COMPLETE!")
+        print("[OK] ALL ANALYSES COMPLETE!")
         print("=" * 50)
         
     except Exception as e:
-        print(f"\n❌ Error occurred: {e}")
+        print(f"\n[ERROR] Error occurred: {e}")
         import traceback
         traceback.print_exc()
 

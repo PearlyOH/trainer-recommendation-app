@@ -42,7 +42,7 @@ def assign_score_tiers():
     # Write to Quant Analysis sheet
     sheets.write_dataframe(SHEET_QUANT_ANALYSIS, output_df, clear_first=False)
     
-    print("✅ Score tier assignment complete")
+    print("[OK] Score tier assignment complete")
     return output_df
 
 if __name__ == "__main__":

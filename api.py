@@ -103,9 +103,9 @@ def get_stats():
         
         return {
             "total_reviews": len(df),
-            "unique_trainers": df['Trainer Model'].nunique(),
-            "run_types": df['Run Type'].value_counts().to_dict(),
-            "terrains": df['Terrain'].value_counts().to_dict()
+            "unique_trainers": df['Trainer Model'].nunique() if 'Trainer Model' in df.columns else 0,
+            "run_types": df['Run Type'].value_counts().to_dict() if 'Run Type' in df.columns else {},
+            "terrains": df['Terrain'].value_counts().to_dict() if 'Terrain' in df.columns else {}
         }
     except Exception as e:
         return {"error": str(e)}

@@ -71,7 +71,7 @@ def clean_data():
     # Write to Clean Live Data sheet
     sheets.write_dataframe(SHEET_CLEAN_DATA, df_processed)
     
-    print("✅ Data cleaning complete")
+    print("[OK] Data cleaning complete")
     return df_processed
 
 if __name__ == "__main__":

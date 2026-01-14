@@ -14,9 +14,17 @@ def create_leaderboard():
     df = sheets.read_to_dataframe(SHEET_CLEAN_DATA)
     
     # Convert Score to numeric
-    df['Score'] = pd.to_numeric(df['Score'], errors='coerce')
+    if 'Score' in df.columns:
+        df['Score'] = pd.to_numeric(df['Score'], errors='coerce')
+    else:
+        print("Error: 'Score' column not found")
+        return None
     
     # Create leaderboard
+    if 'Trainer Model' not in df.columns:
+        print("Error: 'Trainer Model' column not found")
+        return None
+    
     leaderboard = (
         df.groupby("Trainer Model")
         .agg(
@@ -34,8 +42,8 @@ def create_leaderboard():
     # Write to Leaderboard sheet
     sheets.write_dataframe(SHEET_LEADERBOARD, leaderboard)
     
-    print("✅ Leaderboard created")
-    print("\n🏆 Top 5 Trainers:")
+    print("[OK] Leaderboard created")
+    print("\n[TOP 5] Top 5 Trainers:")
     print(leaderboard)
     
     return leaderboard

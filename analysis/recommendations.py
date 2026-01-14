@@ -65,7 +65,7 @@ def get_recommendations(five_k_time, run_type, terrain, gender):
     print(f"After filtering by 5k time (sub {five_k_time}): {len(df)} records")
     
     if df.empty:
-        print("\n❌ No trainers found matching all criteria")
+        print("\n[ERROR] No trainers found matching all criteria")
         print("Try broadening your search criteria")
         return None
     
@@ -85,7 +85,7 @@ def get_recommendations(five_k_time, run_type, terrain, gender):
     recommendations['Avg_Score'] = recommendations['Avg_Score'].round(1)
     recommendations['Avg_5k_Time'] = recommendations['Avg_5k_Time'].round(0)
     
-    print(f"\n✅ Found {len(recommendations)} matching trainers:")
+    print(f"\n[OK] Found {len(recommendations)} matching trainers:")
     print(recommendations.to_string(index=False))
     
     return recommendations

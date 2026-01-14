@@ -26,6 +26,10 @@ def analyze_usage_patterns():
         return series.mode().iloc[0] if not series.mode().empty else None
     
     # Aggregate usage patterns
+    if 'Trainer Model' not in df.columns:
+        print("Error: 'Trainer Model' column not found")
+        return None
+    
     usage_patterns = (
         df.groupby("Trainer Model")
         .agg(
@@ -47,8 +51,8 @@ def analyze_usage_patterns():
     # Write to Usage Patterns sheet
     sheets.write_dataframe(SHEET_USAGE_PATTERNS, usage_patterns)
     
-    print("✅ Usage patterns analysis complete")
-    print("\n📊 Usage Patterns:")
+    print("[OK] Usage patterns analysis complete")
+    print("\n[PATTERNS] Usage Patterns:")
     print(usage_patterns.head())
     
     return usage_patterns

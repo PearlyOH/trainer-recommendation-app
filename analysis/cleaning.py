@@ -23,27 +23,121 @@ def clean_data():
     # Create DataFrame with original headers
     df_raw = pd.DataFrame(data_rows, columns=headers)
     
-    # Manually rename columns by position to handle duplicates
-    new_columns = df_raw.columns.tolist()
-    new_columns[3] = "Name"
-    new_columns[9] = "Trainer Model"
-    new_columns[10] = "Run Type"
-    new_columns[11] = "Distance in Trainers (km)"
-    new_columns[12] = "Terrain"  # This is the duplicate that's actually terrain
-    new_columns[13] = "Months Wearing"  # Adding this column
-    new_columns[14] = "Post Run Feel"
-    new_columns[15] = "Pain Experienced"
-    new_columns[17] = "Comfort Rating"
-    new_columns[18] = "Cushioning Rating"
-    new_columns[19] = "Responsiveness Rating"
-    new_columns[20] = "Easy Run Pace"
-    new_columns[21] = "Average 5k Time"
-    new_columns[22] = "Improvement Suggestions"
+    # Print ALL headers with positions for debugging
+    print(f"\nFound {len(headers)} columns in raw data:")
+    print("=" * 80)
+    for i, col in enumerate(headers):
+        print(f"  [{i}] {col}")
+    print("=" * 80)
     
-    df_raw.columns = new_columns
+    import re
     
-    # Drop unnecessary columns
-    cols_to_drop = [
+    # Define column mapping with more specific patterns
+    # Order matters - more specific patterns should come first
+    column_patterns = [
+        # Exact or very specific matches first
+        (r'^.*submission.*id.*$', "Submission ID", False),
+        (r'^.*submitted.*at.*$', "Submitted at", False),
+        (r'^.*name.*$', "Name", False),
+        (r'^.*what.*gender.*do.*you.*identify.*with.*\?$', "Gender", False),  # Main gender question
+        (r'^.*foot.*width.*$', "Foot Width", False),
+        (r'^.*trainer.*model.*$', "Trainer Model", False),  # Column K
+        (r'^.*run.*type.*$', "Run Type", False),
+        (r'^.*distance.*trainer.*km.*$', "Total Distance", False),
+        (r'^.*distance.*trainer.*$', "Total Distance", False),
+        (r'^.*terrain.*$', "Terrain", False),
+        (r'^.*months.*wear.*$', "Months Wearing", False),
+        (r'^.*post.*run.*feel.*$', "Post Run Feel", False),
+        (r'^.*pain.*experience.*$', "Pain Experienced", False),
+        (r'^.*more.*information.*$', "More Information", False),  # Column S
+        (r'^.*comfort.*rating.*$', "Comfort Rating", False),
+        (r'^.*cushioning.*rating.*$', "Cushioning Rating", False),
+        (r'^.*responsiveness.*rating.*$', "Responsiveness Rating", False),
+        (r'^.*easy.*run.*pace.*$', "Easy Run Pace", False),
+        (r'^.*average.*5k.*race.*time.*minutes.*$', None, True),  # Drop this duplicate
+        (r'^.*average.*5k.*time.*$', "Average 5k Time", False),
+        (r'^.*5k.*time.*$', "Average 5k Time", False),
+        (r'^.*improvement.*suggestion.*$', "Improvement Suggestions", False),
+        (r'^.*magic.*wand.*change.*one.*thing.*$', None, True),  # Drop this duplicate
+        (r'^.*how.*do.*your.*trainers.*feel.*after.*typical.*run.*$', None, True),  # Drop this duplicate
+        (r'^.*would.*you.*recommend.*trainer.*friend.*\?.*$', "Would Recommend", False),
+        (r'^.*would.*recommend.*$', "Would Recommend", False),
+        (r'^.*score.*$', "Score", False),
+    ]
+    
+    # Columns to exclude from mapping (these will be dropped)
+    exclude_patterns = [
+        r'respondent.*id',
+        r'gender.*male',
+        r'gender.*female',
+        r'gender.*non-binary',
+        r'gender.*prefer.*not',
+        r'recommend.*yes',
+        r'recommend.*no',
+        r'recommend.*depends',
+    ]
+    
+    # Create mapping dictionary
+    column_mapping = {}
+    matched_clean_names = set()  # Track which clean names we've already mapped
+    columns_to_drop = []  # Track columns to drop
+    
+    # First, check if column should be excluded
+    def should_exclude(col_name):
+        col_lower = str(col_name).lower().strip()
+        for pattern in exclude_patterns:
+            if re.search(pattern, col_lower, re.IGNORECASE):
+                return True
+        return False
+    
+    # Match columns using patterns
+    print("\nMapping columns:")
+    print("-" * 80)
+    for col in headers:
+        col_lower = str(col).lower().strip()
+        
+        # Skip if should be excluded
+        if should_exclude(col):
+            print(f"  Excluding: '{col}'")
+            columns_to_drop.append(col)
+            continue
+        
+        # Skip if already mapped
+        if col in column_mapping:
+            continue
+        
+        # Try to match against patterns (in order)
+        matched = False
+        for pattern, clean_name, should_drop in column_patterns:
+            # Check pattern match
+            if re.search(pattern, col_lower, re.IGNORECASE):
+                if should_drop or clean_name is None:
+                    # This column should be dropped
+                    columns_to_drop.append(col)
+                    print(f"  Dropping duplicate: '{col}'")
+                    matched = True
+                    break
+                elif clean_name not in matched_clean_names:
+                    # Map to clean name
+                    column_mapping[col] = clean_name
+                    matched_clean_names.add(clean_name)
+                    print(f"  Mapped: '{col}' -> '{clean_name}'")
+                    matched = True
+                    break
+        
+        if not matched:
+            print(f"  No match: '{col}'")
+    
+    print("-" * 80)
+    
+    # Apply the mapping
+    df_raw = df_raw.rename(columns=column_mapping)
+    
+    # Drop excluded and duplicate columns
+    all_cols_to_drop = list(set(columns_to_drop))
+    
+    # Also drop exact matches
+    exact_drops = [
         'Respondent ID',
         'What gender do you identify with? (Male)',
         'What gender do you identify with? (Female)',
@@ -54,8 +148,19 @@ def clean_data():
         'Would you recommend this trainer to a friend?\n (Depends)'
     ]
     
-    existing_cols_to_drop = [col for col in cols_to_drop if col in df_raw.columns]
+    for col in exact_drops:
+        if col in df_raw.columns:
+            all_cols_to_drop.append(col)
+    
+    existing_cols_to_drop = [col for col in all_cols_to_drop if col in df_raw.columns]
     df_processed = df_raw.drop(columns=existing_cols_to_drop) if existing_cols_to_drop else df_raw.copy()
+    
+    # Show unmapped columns for debugging
+    unmapped = [col for col in df_processed.columns if col not in column_mapping.values()]
+    if unmapped:
+        print(f"\n  Warning: {len(unmapped)} columns not mapped:")
+        for col in unmapped:
+            print(f"    - '{col}'")
     
     # Convert numeric columns
     numeric_cols = ['Comfort Rating', 'Cushioning Rating', 'Responsiveness Rating', 'Score']
@@ -65,13 +170,14 @@ def clean_data():
             df_processed[col] = pd.to_numeric(df_processed[col].astype(str), errors='coerce')
     
     # Convert distance to numeric
-    if 'Distance in Trainers (km)' in df_processed.columns:
-        df_processed['Distance in Trainers (km)'] = pd.to_numeric(df_processed['Distance in Trainers (km)'], errors='coerce')
+    if 'Total Distance' in df_processed.columns:
+        df_processed['Total Distance'] = pd.to_numeric(df_processed['Total Distance'], errors='coerce')
     
     # Write to Clean Live Data sheet
     sheets.write_dataframe(SHEET_CLEAN_DATA, df_processed)
     
-    print("[OK] Data cleaning complete")
+    print("\n[OK] Data cleaning complete")
+    print(f"Final columns ({len(df_processed.columns)}): {list(df_processed.columns)}")
     return df_processed
 
 if __name__ == "__main__":

@@ -5,19 +5,27 @@ from config.settings import SHEET_CLEAN_DATA
 
 
 def parse_5k_time(time_str):
-    """Convert 'sub 20', 'sub 25' etc to numeric value"""
+    """Convert 'sub 20', 'sub 25', '40 minutes', '40 mins' etc to numeric value"""
+    import re
     if pd.isna(time_str) or time_str == '':
         return None
     
     time_str = str(time_str).lower().strip()
     
-    # Extract number from formats like "sub 20", "sub20", "20"
+    # Remove "sub" so "sub 40" or "sub40" leave "40"
     if 'sub' in time_str:
         time_str = time_str.replace('sub', '').strip()
     
+    # Extract first number (handles "40", "40 minutes", "40 mins", "40-45" -> 40)
+    match = re.search(r'(\d+)', time_str)
+    if match:
+        try:
+            return float(match.group(1))
+        except (ValueError, TypeError):
+            return None
     try:
         return float(time_str)
-    except:
+    except (ValueError, TypeError):
         return None
 
 

@@ -89,12 +89,25 @@ def get_recommendations(five_k_time, run_type, terrain, gender, foot_width=None)
             df = df[df['Gender'].str.lower().str.contains(gender.lower(), na=False)]
             print(f"After filtering by gender '{gender}': {len(df)} records")
     
+    # Resolve Foot Width column (sheet header may differ, e.g. trailing newline or full Tally question)
+    foot_width_col = None
+    if 'Foot Width' in df.columns:
+        foot_width_col = 'Foot Width'
+    else:
+        for col in df.columns:
+            c = str(col).lower().strip()
+            if 'foot' in c and 'width' in c:
+                foot_width_col = col
+                break
+    
     # Filter by foot width (optional)
     if foot_width and foot_width.lower() not in ["", "any"]:
-        if 'Foot Width' not in df.columns:
+        if foot_width_col is None:
             print("WARNING: 'Foot Width' column not found, skipping filter")
         else:
-            df = df[df['Foot Width'].str.lower() == foot_width.lower()]
+            # Compare as strings, normalise whitespace and handle NaN
+            fw_series = df[foot_width_col].astype(str).str.lower().str.strip()
+            df = df[fw_series == foot_width.lower().strip()]
             print(f"After filtering by foot width '{foot_width}': {len(df)} records")
     
     # Filter by exact 5k time bracket match

@@ -90,10 +90,15 @@ def get_trainer_recommendations(request: RecommendationRequest):
                 "data": []
             }
         
+        # Replace NaN/inf before JSON serialization to avoid 500 errors
+        safe_result = result.copy()
+        safe_result = safe_result.replace([float("inf"), float("-inf")], pd.NA)
+        safe_result = safe_result.astype(object).where(pd.notnull(safe_result), None)
+
         return {
             "success": True,
-            "data": result.to_dict(orient='records'),
-            "count": len(result)
+            "data": safe_result.to_dict(orient='records'),
+            "count": len(safe_result)
         }
     except Exception as e:
         return {"error": str(e)}

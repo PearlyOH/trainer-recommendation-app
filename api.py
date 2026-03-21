@@ -24,10 +24,12 @@ app.add_middleware(
 
 # Request model for recommendations
 class RecommendationRequest(BaseModel):
-    five_k_time: int  # e.g., 25 for "sub 25"
+    run_goal: str  # "Beginner/Walk", "First 5k", "Comfy/Long Run", "Speed/Tempo"
     run_type: str  # e.g., "Long run"
     terrain: str  # e.g., "Road"
-    gender: str  # e.g., "Female"
+    weight: str  # e.g., "Between 65kg - 85kg"
+    foot_width: Optional[str] = None  # e.g., "Narrow", "Regular", "Wide"
+    pain: Optional[str] = None  # e.g., "knee pain"
 
 @app.get("/")
 def root():
@@ -73,10 +75,12 @@ def get_trainer_recommendations(request: RecommendationRequest):
     """Get personalized trainer recommendations based on user inputs"""
     try:
         result = get_recommendations(
-            five_k_time=request.five_k_time,
+            run_goal=request.run_goal,
             run_type=request.run_type,
             terrain=request.terrain,
-            gender=request.gender
+            foot_width=request.foot_width,
+            weight=request.weight,
+            pain=request.pain
         )
         
         if result is None or result.empty:

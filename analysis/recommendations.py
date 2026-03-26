@@ -167,6 +167,8 @@ def get_recommendations(run_goal, run_type, terrain, foot_width=None, weight=Non
     # Pain/discomfort filter (optional):
     # - If user says "No Pain", INCLUDE only rows that indicate no pain/discomfort.
     # - Otherwise, EXCLUDE rows where reviewer pain text contains the user's pain type.
+    df_before_pain_filter = df.copy()
+    used_pain_fallback = False
     if pain and pain.lower() not in ["", "any"]:
         if pain_col is None:
             print("WARNING: 'Pain Experienced' column not found, skipping filter")
@@ -184,6 +186,11 @@ def get_recommendations(run_goal, run_type, terrain, foot_width=None, weight=Non
             else:
                 df = df[~pain_series.str.contains(pain_query, na=False)]
                 print(f"After excluding pain '{pain}': {len(df)} records")
+                if df.empty:
+                    # Fallback strategy: keep candidates and apply pain as penalty only
+                    df = df_before_pain_filter.copy()
+                    used_pain_fallback = True
+                    print("INFO: No results after pain exclusion; falling back to penalty-only pain scoring")
     
     # ===========================================
     # CHECK RESULTS
@@ -288,6 +295,9 @@ def get_recommendations(run_goal, run_type, terrain, foot_width=None, weight=Non
     recommendations['Avg_Score'] = recommendations['Avg_Score'].round(1)
     recommendations['Match_Percentage'] = recommendations['Match_Percentage'].round(0)
     
+    if used_pain_fallback:
+        print("INFO: Returned closest matches (pain treated as penalty, not hard exclusion)")
+
     print(f"\n[OK] Found {len(recommendations)} matching trainers:")
     print(recommendations.to_string(index=False))
     

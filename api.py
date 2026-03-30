@@ -98,7 +98,9 @@ def get_trainer_recommendations(request: RecommendationRequest):
         return {
             "success": True,
             "data": safe_result.to_dict(orient='records'),
-            "count": len(safe_result)
+            "count": len(safe_result),
+            "strategy_used": safe_result.attrs.get("strategy_used", "exact_filters"),
+            "cautions": safe_result.attrs.get("cautions", [])
         }
     except Exception as e:
         return {"error": str(e)}

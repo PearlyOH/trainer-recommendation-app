@@ -90,7 +90,7 @@ def get_recommendations(run_goal, run_type, terrain, foot_width=None, weight=Non
     print(f"\nTotal records in database: {len(df)}")
     
     # ===========================================
-    # FILTERING
+    # FILTERING + FALLBACK STRATEGY
     # ===========================================
     
     run_type_col = _resolve_column(df, "Run Type", "run", "type")
@@ -118,22 +118,6 @@ def get_recommendations(run_goal, run_type, terrain, foot_width=None, weight=Non
         TRAINER_MODEL_COL_ALT if TRAINER_MODEL_COL_ALT in df.columns else _resolve_column(df, "Trainer Model", "brand", "model")
     )
 
-    # Filter by run type
-    if run_type:
-        if run_type_col is None:
-            print("WARNING: 'Run Type' column not found, skipping filter")
-        else:
-            df = df[df[run_type_col].astype(str).str.lower().str.contains(run_type.lower(), na=False)]
-            print(f"After filtering by run type '{run_type}': {len(df)} records")
-    
-    # Filter by terrain
-    if terrain:
-        if terrain_col is None:
-            print("WARNING: 'Terrain' column not found, skipping filter")
-        else:
-            df = df[df[terrain_col].astype(str).str.lower().str.contains(terrain.lower(), na=False)]
-            print(f"After filtering by terrain '{terrain}': {len(df)} records")
-    
     # Resolve Foot Width column (sheet header may differ, e.g. trailing newline or full Tally question)
     foot_width_col = None
     if 'Foot Width' in df.columns:
@@ -145,52 +129,81 @@ def get_recommendations(run_goal, run_type, terrain, foot_width=None, weight=Non
                 foot_width_col = col
                 break
     
-    # Filter by foot width (optional)
-    if foot_width and foot_width.lower() not in ["", "any"]:
-        if foot_width_col is None:
-            print("WARNING: 'Foot Width' column not found, skipping filter")
-        else:
-            # Compare as strings, normalise whitespace and handle NaN
-            fw_series = df[foot_width_col].astype(str).str.lower().str.strip()
-            df = df[fw_series == foot_width.lower().strip()]
-            print(f"After filtering by foot width '{foot_width}': {len(df)} records")
+    def apply_base_filters(source_df, use_run_type=True, use_terrain=True, use_foot=True, use_weight=True, label=""):
+        out = source_df.copy()
+        if label:
+            print(f"\nApplying strategy: {label}")
+        if use_run_type and run_type and run_type_col is not None:
+            out = out[out[run_type_col].astype(str).str.lower().str.contains(run_type.lower(), na=False)]
+            print(f"After filtering by run type '{run_type}': {len(out)} records")
+        if use_terrain and terrain and terrain_col is not None:
+            out = out[out[terrain_col].astype(str).str.lower().str.contains(terrain.lower(), na=False)]
+            print(f"After filtering by terrain '{terrain}': {len(out)} records")
+        if use_foot and foot_width and foot_width.lower() not in ["", "any"] and foot_width_col is not None:
+            fw_series = out[foot_width_col].astype(str).str.lower().str.strip()
+            out = out[fw_series == foot_width.lower().strip()]
+            print(f"After filtering by foot width '{foot_width}': {len(out)} records")
+        if use_weight and weight and weight.lower() not in ["", "any"] and weight_col is not None:
+            weight_series = out[weight_col].astype(str).str.lower().str.strip()
+            out = out[weight_series == weight.lower().strip()]
+            print(f"After filtering by weight '{weight}': {len(out)} records")
+        return out
 
-    # Filter by weight (optional, exact-match like foot width)
-    if weight and weight.lower() not in ["", "any"]:
-        if weight_col is None:
-            print("WARNING: 'Weight' column not found, skipping filter")
-        else:
-            weight_series = df[weight_col].astype(str).str.lower().str.strip()
-            df = df[weight_series == weight.lower().strip()]
-            print(f"After filtering by weight '{weight}': {len(df)} records")
-
-    # Pain/discomfort filter (optional):
-    # - If user says "No Pain", INCLUDE only rows that indicate no pain/discomfort.
-    # - Otherwise, EXCLUDE rows where reviewer pain text contains the user's pain type.
-    df_before_pain_filter = df.copy()
-    used_pain_fallback = False
-    if pain and pain.lower() not in ["", "any"]:
-        if pain_col is None:
-            print("WARNING: 'Pain Experienced' column not found, skipping filter")
-        else:
-            pain_series = df[pain_col].astype(str).str.lower().str.strip()
-            pain_query = pain.lower().strip()
-            if pain_query in ["no pain", "no discomfort", "none"]:
-                no_pain_mask = (
-                    pain_series.str.contains("no pain", na=False)
-                    | pain_series.str.contains("no discomfort", na=False)
-                    | pain_series.str.fullmatch("none", na=False)
-                )
-                df = df[no_pain_mask]
-                print(f"After including no-pain reviews '{pain}': {len(df)} records")
+    def apply_pain_filter(source_df):
+        out = source_df.copy()
+        used_local_pain_fallback = False
+        if pain and pain.lower() not in ["", "any"]:
+            if pain_col is None:
+                print("WARNING: 'Pain Experienced' column not found, skipping filter")
             else:
-                df = df[~pain_series.str.contains(pain_query, na=False)]
-                print(f"After excluding pain '{pain}': {len(df)} records")
-                if df.empty:
-                    # Fallback strategy: keep candidates and apply pain as penalty only
-                    df = df_before_pain_filter.copy()
-                    used_pain_fallback = True
-                    print("INFO: No results after pain exclusion; falling back to penalty-only pain scoring")
+                pain_series = out[pain_col].astype(str).str.lower().str.strip()
+                pain_query = pain.lower().strip()
+                if pain_query in ["no pain", "no discomfort", "none"]:
+                    no_pain_mask = (
+                        pain_series.str.contains("no pain", na=False)
+                        | pain_series.str.contains("no discomfort", na=False)
+                        | pain_series.str.fullmatch("none", na=False)
+                    )
+                    out = out[no_pain_mask]
+                    print(f"After including no-pain reviews '{pain}': {len(out)} records")
+                else:
+                    out_before = out.copy()
+                    out = out[~pain_series.str.contains(pain_query, na=False)]
+                    print(f"After excluding pain '{pain}': {len(out)} records")
+                    if out.empty:
+                        out = out_before
+                        used_local_pain_fallback = True
+                        print("INFO: No results after pain exclusion; falling back to penalty-only pain scoring")
+        return out, used_local_pain_fallback
+
+    strategy_used = "exact_filters"
+    cautions = []
+    base_df = df.copy()
+
+    # Tier 1: exact filters
+    df = apply_base_filters(base_df, True, True, True, True, "exact_filters")
+    df, used_pain_fallback = apply_pain_filter(df)
+    if used_pain_fallback:
+        cautions.append("No pain-safe exact matches found; returned closest alternatives with pain penalty.")
+
+    # Tier 2+: relax filters if still empty
+    if df.empty:
+        tiers = [
+            ("relaxed_weight", dict(use_run_type=True, use_terrain=True, use_foot=True, use_weight=False)),
+            ("relaxed_weight_and_foot_width", dict(use_run_type=True, use_terrain=True, use_foot=False, use_weight=False)),
+            ("relaxed_run_type_weight_foot_width", dict(use_run_type=False, use_terrain=True, use_foot=False, use_weight=False)),
+            ("relaxed_all_except_pain", dict(use_run_type=False, use_terrain=False, use_foot=False, use_weight=False)),
+        ]
+        for tier_name, flags in tiers:
+            candidate = apply_base_filters(base_df, label=tier_name, **flags)
+            candidate, tier_pain_fallback = apply_pain_filter(candidate)
+            if not candidate.empty:
+                df = candidate
+                strategy_used = tier_name
+                cautions.append("No exact matches found; filters were relaxed to provide close matches.")
+                if tier_pain_fallback:
+                    cautions.append("Pain preference was applied as a penalty for close-match fallback.")
+                break
     
     # ===========================================
     # CHECK RESULTS
@@ -199,9 +212,8 @@ def get_recommendations(run_goal, run_type, terrain, foot_width=None, weight=Non
     if df.empty:
         print("\n[WARN] No trainers found matching all criteria")
         print("Suggestions:")
-        print("  - Try a different 5k time bracket")
+        print("  - Try broader run/terrain choices")
         print("  - Try 'Mixed' terrain")
-        print("  - Remove gender filter")
         print("  - Try 'Regular' foot width")
         return None
     
@@ -295,8 +307,10 @@ def get_recommendations(run_goal, run_type, terrain, foot_width=None, weight=Non
     recommendations['Avg_Score'] = recommendations['Avg_Score'].round(1)
     recommendations['Match_Percentage'] = recommendations['Match_Percentage'].round(0)
     
-    if used_pain_fallback:
-        print("INFO: Returned closest matches (pain treated as penalty, not hard exclusion)")
+    recommendations.attrs["strategy_used"] = strategy_used
+    recommendations.attrs["cautions"] = cautions
+    if cautions:
+        print("INFO: " + " | ".join(cautions))
 
     print(f"\n[OK] Found {len(recommendations)} matching trainers:")
     print(recommendations.to_string(index=False))

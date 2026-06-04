@@ -4,6 +4,19 @@ from datetime import datetime
 from services.sheets_service import SheetsService
 from config.settings import SHEET_CLEAN_DATA, SHEET_LEADERBOARD
 
+TRAINER_MODEL_COL_ALT = "What's the brand and model of this trainer? e.g. Nike Pegasus 40 or Adidas Adizero Pro 4"
+
+def _trainer_model_column(df):
+    """Resolve trainer model column. Prefer long Tally name (Column F with data); Column G may be empty 'Trainer Model' from old question."""
+    if TRAINER_MODEL_COL_ALT in df.columns:
+        return TRAINER_MODEL_COL_ALT
+    if "Trainer Model" in df.columns:
+        return "Trainer Model"
+    for c in df.columns:
+        if c and "brand" in c.lower() and "model" in c.lower():
+            return c
+    return None
+
 def create_leaderboard():
     """Create top 5 trainers leaderboard"""
     print("Creating leaderboard...")
@@ -20,18 +33,20 @@ def create_leaderboard():
         print("Error: 'Score' column not found")
         return None
     
-    # Create leaderboard
-    if 'Trainer Model' not in df.columns:
-        print("Error: 'Trainer Model' column not found")
+    # Resolve trainer model column (cleaning may rename to "Trainer Model" or leave Tally name)
+    trainer_col = _trainer_model_column(df)
+    if trainer_col is None:
+        print("Error: 'Trainer Model' column not found. Actual columns:", list(df.columns))
         return None
     
     leaderboard = (
-        df.groupby("Trainer Model")
+        df.groupby(trainer_col)
         .agg(
             Avg_Score=("Score", "mean"),
             Respondents=("Score", "count")
         )
         .reset_index()
+        .rename(columns={trainer_col: "Trainer Model"})
         .sort_values(by="Avg_Score", ascending=False)
         .head(5)
     )

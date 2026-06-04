@@ -27,7 +27,10 @@ def clean_data():
     print(f"\nFound {len(headers)} columns in raw data:")
     print("=" * 80)
     for i, col in enumerate(headers):
-        print(f"  [{i}] {col}")
+        # Avoid Windows cp1252 console crashes on uncommon Unicode chars in headers
+        col_text = str(col)
+        safe_col_text = col_text.encode("cp1252", errors="replace").decode("cp1252")
+        print(f"  [{i}] {safe_col_text}")
     print("=" * 80)
     
     import re
@@ -41,6 +44,8 @@ def clean_data():
         (r'^.*name.*$', "Name", False),
         (r'^.*what.*gender.*do.*you.*identify.*with.*\?$', "Gender", False),  # Main gender question
         (r'^.*foot.*width.*$', "Foot Width", False),
+        (r'^.*what.*weight.*category.*do.*you.*belong.*to.*\?$', "Weight", False),
+        (r'^.*what.*age.*category.*do.*you.*belong.*to.*\?$', "Age", False),
         (r'^.*trainer.*model.*$', "Trainer Model", False),  # Column K
         (r'^.*run.*type.*$', "Run Type", False),
         (r'^.*distance.*trainer.*km.*$', "Total Distance", False),
@@ -58,10 +63,11 @@ def clean_data():
         (r'^.*average.*5k.*time.*$', "Average 5k Time", False),
         (r'^.*5k.*time.*$', "Average 5k Time", False),
         (r'^.*improvement.*suggestion.*$', "Improvement Suggestions", False),
-        (r'^.*magic.*wand.*change.*one.*thing.*$', None, True),  # Drop this duplicate
+        (r'^.*magic.*wand.*change.*one.*thing.*$', "Improvement Suggestions", False),  # Drop this duplicate
         (r'^.*how.*do.*your.*trainers.*feel.*after.*typical.*run.*$', None, True),  # Drop this duplicate
         (r'^.*would.*you.*recommend.*trainer.*friend.*\?.*$', "Would Recommend", False),
         (r'^.*would.*recommend.*$', "Would Recommend", False),
+        (r'^.*email.*$', "Email", False),  # Optional email at end of form (for User B tracking)
         (r'^.*score.*$', "Score", False),
     ]
     
@@ -72,6 +78,8 @@ def clean_data():
         r'gender.*female',
         r'gender.*non-binary',
         r'gender.*prefer.*not',
+        r'what.*weight.*category.*\(.*\)',
+        r'what.*age.*category.*\(.*\)',
         r'recommend.*yes',
         r'recommend.*no',
         r'recommend.*depends',
@@ -84,7 +92,7 @@ def clean_data():
     
     # First, check if column should be excluded
     def should_exclude(col_name):
-        col_lower = str(col_name).lower().strip()
+        col_lower = re.sub(r'\s+', ' ', str(col_name).lower()).strip()
         for pattern in exclude_patterns:
             if re.search(pattern, col_lower, re.IGNORECASE):
                 return True
@@ -94,11 +102,12 @@ def clean_data():
     print("\nMapping columns:")
     print("-" * 80)
     for col in headers:
-        col_lower = str(col).lower().strip()
+        col_lower = re.sub(r'\s+', ' ', str(col).lower()).strip()
         
         # Skip if should be excluded
         if should_exclude(col):
-            print(f"  Excluding: '{col}'")
+            safe_col = str(col).encode("cp1252", errors="replace").decode("cp1252")
+            print(f"  Excluding: '{safe_col}'")
             columns_to_drop.append(col)
             continue
         
@@ -114,19 +123,22 @@ def clean_data():
                 if should_drop or clean_name is None:
                     # This column should be dropped
                     columns_to_drop.append(col)
-                    print(f"  Dropping duplicate: '{col}'")
+                    safe_col = str(col).encode("cp1252", errors="replace").decode("cp1252")
+                    print(f"  Dropping duplicate: '{safe_col}'")
                     matched = True
                     break
                 elif clean_name not in matched_clean_names:
                     # Map to clean name
                     column_mapping[col] = clean_name
                     matched_clean_names.add(clean_name)
-                    print(f"  Mapped: '{col}' -> '{clean_name}'")
+                    safe_col = str(col).encode("cp1252", errors="replace").decode("cp1252")
+                    print(f"  Mapped: '{safe_col}' -> '{clean_name}'")
                     matched = True
                     break
         
         if not matched:
-            print(f"  No match: '{col}'")
+            safe_col = str(col).encode("cp1252", errors="replace").decode("cp1252")
+            print(f"  No match: '{safe_col}'")
     
     print("-" * 80)
     

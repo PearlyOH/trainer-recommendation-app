@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StridelyIQ — Trainer admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green: #39FF14;
+      --green-dark: #2BC70A;
+      --green-soft: #E9FFE0;
+      --text: #0A0A0A;
+      --text-2: #5F5E5A;
+      --text-3: #9A9A95;
+      --border: #E5E5E2;
+      --bg: #FAFAF7;
+      --bg-card: #FFFFFF;
+      --bg-soft: #F4F4F0;
+      --danger: #C53030;
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .topbar {
+      background: var(--bg-card);
+      border-bottom: 0.5px solid var(--border);
+      padding: 16px 32px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-mark {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: var(--text); color: var(--green);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 14px;
+    }
+    .brand-name { font-weight: 600; font-size: 15px; }
+    .brand-tag {
+      font-size: 11px; color: var(--text-2);
+      background: var(--bg-soft); padding: 2px 8px; border-radius: 999px;
+      margin-left: 6px;
+    }
+    .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--text-3); margin-right: 6px; }
+    .status-dot.ok { background: var(--green-dark); }
+    .status-dot.err { background: var(--danger); }
+    .api-status { font-size: 12px; color: var(--text-2); }
+
+    .container { max-width: 1200px; margin: 32px auto; padding: 0 32px; }
+
+    .header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; gap: 12px; flex-wrap: wrap; }
+    .title { font-size: 22px; font-weight: 600; margin: 0 0 4px; letter-spacing: -0.01em; }
+    .sub { font-size: 13px; color: var(--text-2); margin: 0; }
+
+    .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .metric {
+      background: var(--bg-card); border: 0.5px solid var(--border);
+      border-radius: var(--radius-md); padding: 14px 16px;
+    }
+    .metric-label { font-size: 12px; color: var(--text-2); margin-bottom: 4px; }
+    .metric-value { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; }
+    .metric.accent { background: var(--green-soft); border-color: var(--green-soft); }
+
+    .toolbar {
+      display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+      margin-bottom: 12px;
+    }
+    input[type="text"], input[type="number"], input[type="password"], select, textarea {
+      height: 36px; font-size: 13px; padding: 0 12px;
+      border: 0.5px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--bg-card); color: var(--text);
+      font-family: inherit; outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    textarea { height: auto; padding: 10px 12px; resize: vertical; min-height: 70px; }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--green-dark);
+      box-shadow: 0 0 0 3px rgba(43, 199, 10, 0.15);
+    }
+    .toolbar input[type="text"] { flex: 1; min-width: 180px; }
+
+    .table-wrap {
+      border: 0.5px solid var(--border); border-radius: var(--radius-lg);
+      background: var(--bg-card); overflow: hidden; box-shadow: var(--shadow);
+    }
+    table.t {
+      width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed;
+    }
+    table.t th {
+      text-align: left; font-weight: 500; font-size: 11px; text-transform: uppercase;
+      letter-spacing: 0.05em; color: var(--text-2);
+      padding: 12px 16px; border-bottom: 0.5px solid var(--border);
+      background: var(--bg-soft);
+    }
+    table.t td {
+      padding: 14px 16px; border-bottom: 0.5px solid var(--border);
+      vertical-align: middle;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    table.t tr:last-child td { border-bottom: none; }
+    table.t tr.draft { opacity: 0.6; }
+
+    .name-cell { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .thumb {
+      width: 40px; height: 40px; border-radius: 8px;
+      background: var(--bg-soft); display: flex; align-items: center; justify-content: center;
+      color: var(--text-3); font-size: 18px; flex-shrink: 0;
+      background-size: cover; background-position: center;
+    }
+    .name-text { min-width: 0; overflow: hidden; }
+    .name-text > div { overflow: hidden; text-overflow: ellipsis; }
+    .name-model { font-weight: 500; }
+    .name-brand { font-size: 12px; color: var(--text-2); margin-top: 1px; }
+
+    .pill { display: inline-block; font-size: 11px; padding: 3px 10px; border-radius: 999px; font-weight: 500; }
+    .pill-road { background: #EAF2FB; color: #1E4A7B; }
+    .pill-trail { background: #F0EAD6; color: #5C4A18; }
+    .pill-both { background: var(--bg-soft); color: var(--text-2); }
+    .pill-active { background: var(--green-soft); color: #1A6B0A; }
+    .pill-draft { background: var(--bg-soft); color: var(--text-2); }
+    .pill-archived { background: #F4E3E3; color: #7B1E1E; }
+
+    button { font-family: inherit; cursor: pointer; }
+    .btn {
+      height: 36px; padding: 0 16px; font-size: 13px; font-weight: 500;
+      border-radius: var(--radius-sm); border: 0.5px solid var(--border);
+      background: var(--bg-card); color: var(--text);
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn:hover { background: var(--bg-soft); }
+    .btn-primary {
+      background: var(--text); color: var(--green); border-color: var(--text);
+    }
+    .btn-primary:hover { background: #1a1a1a; }
+    .btn-green {
+      background: var(--green); color: var(--text); border-color: var(--green-dark);
+    }
+    .btn-green:hover { background: var(--green-dark); }
+    .btn-danger { color: var(--danger); border-color: #E8D0D0; }
+    .btn-danger:hover { background: #FDF5F5; }
+    .icon-btn {
+      width: 30px; height: 30px; padding: 0; border-radius: var(--radius-sm);
+      border: 0.5px solid var(--border); background: transparent;
+      color: var(--text-2); display: inline-flex; align-items: center; justify-content: center;
+    }
+    .icon-btn:hover { background: var(--bg-soft); color: var(--text); }
+    .icon-btn + .icon-btn { margin-left: 4px; }
+    .icon-btn svg { width: 14px; height: 14px; }
+
+    .price { font-variant-numeric: tabular-nums; font-weight: 500; }
+    .price-stale { color: var(--text-3); }
+
+    .empty { padding: 48px 16px; text-align: center; color: var(--text-2); font-size: 13px; }
+    .empty strong { color: var(--text); font-weight: 600; display: block; margin-bottom: 4px; }
+    .foot { font-size: 12px; color: var(--text-3); padding: 12px 16px; background: var(--bg-soft); border-top: 0.5px solid var(--border); }
+
+    /* Modal */
+    .modal-bg {
+      position: fixed; inset: 0; background: rgba(10, 10, 10, 0.5);
+      display: none; align-items: flex-start; justify-content: center;
+      z-index: 100; padding: 40px 16px; overflow-y: auto;
+    }
+    .modal-bg.open { display: flex; }
+    .modal {
+      background: var(--bg-card); border-radius: var(--radius-lg);
+      padding: 24px; width: 100%; max-width: 640px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.16);
+    }
+    .modal h3 { margin: 0 0 4px; font-size: 18px; font-weight: 600; }
+    .modal .modal-sub { margin: 0 0 20px; font-size: 13px; color: var(--text-2); }
+
+    .fetch-block {
+      background: var(--bg-soft); border-radius: var(--radius-md);
+      padding: 14px; margin-bottom: 16px;
+    }
+    .fetch-block label { font-size: 12px; color: var(--text-2); display: block; margin-bottom: 6px; }
+    .fetch-row { display: flex; gap: 8px; }
+    .fetch-row input { flex: 1; }
+    .fetch-status { font-size: 12px; margin-top: 8px; min-height: 16px; }
+    .fetch-status.ok { color: var(--green-dark); }
+    .fetch-status.err { color: var(--danger); }
+
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { font-size: 12px; color: var(--text-2); font-weight: 500; }
+    .field .hint { font-size: 11px; color: var(--text-3); }
+
+    .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 24px; padding-top: 16px; border-top: 0.5px solid var(--border); }
+    .actions .left { margin-right: auto; }
+
+    /* Auth gate */
+    .gate {
+      max-width: 380px; margin: 120px auto; padding: 32px;
+      background: var(--bg-card); border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg); box-shadow: var(--shadow);
+    }
+    .gate h2 { margin: 0 0 8px; font-size: 20px; font-weight: 600; }
+    .gate p { margin: 0 0 20px; font-size: 13px; color: var(--text-2); }
+    .gate input { width: 100%; margin-bottom: 12px; }
+    .gate .btn { width: 100%; justify-content: center; }
+    .gate .err { color: var(--danger); font-size: 12px; margin-top: 8px; min-height: 14px; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--text); color: white; padding: 12px 18px;
+      border-radius: var(--radius-md); font-size: 13px; box-shadow: var(--shadow);
+      transform: translateY(80px); opacity: 0; transition: all 0.2s;
+      z-index: 200;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: var(--green-dark); }
+    .toast.error { background: var(--danger); }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- Auth gate (shown until valid admin key is entered) -->
+<div id="gate" class="gate">
+  <h2>Admin access</h2>
+  <p>Enter your admin key to manage the StridelyIQ trainer catalogue.</p>
+  <input type="password" id="gate-key" placeholder="Admin key" autocomplete="off" />
+  <button class="btn btn-primary" id="gate-submit">Continue</button>
+  <div class="err" id="gate-err"></div>
+</div>
+
+<!-- Main app (hidden until authed) -->
+<div id="app" class="hidden">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">S</div>
+      <div class="brand-name">StridelyIQ <span class="brand-tag">admin</span></div>
+    </div>
+    <div class="api-status">
+      <span class="status-dot" id="api-dot"></span><span id="api-text">connecting…</span>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1 class="title">Trainer catalogue</h1>
+        <p class="sub">Source of truth for the leaderboard and quiz recommendations.</p>
+      </div>
+      <div>
+        <button class="btn" id="refresh-btn" title="Refresh prices from Awin (when connected)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></svg>
+          Refresh prices
+        </button>
+        <button class="btn btn-green" id="add-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          Add trainer
+        </button>
+      </div>
+    </div>
+
+    <div class="metrics" id="metrics"></div>
+
+    <div class="toolbar">
+      <input type="text" id="q" placeholder="Search trainers…" />
+      <select id="f-brand"><option value="">All brands</option></select>
+      <select id="f-terrain">
+        <option value="">All terrain</option>
+        <option>Road</option><option>Trail</option><option>Both</option>
+      </select>
+      <select id="f-status">
+        <option value="">All status</option>
+        <option value="active">Active</option>
+        <option value="draft">Draft</option>
+        <option value="archived">Archived</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <table class="t">
+        <colgroup>
+          <col style="width: 28%"><col style="width: 10%"><col style="width: 10%">
+          <col style="width: 8%"><col style="width: 8%"><col style="width: 9%">
+          <col style="width: 10%"><col style="width: 17%">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Trainer</th><th>Terrain</th><th>Run type</th>
+            <th>Drop</th><th>Stack</th><th>Weight</th>
+            <th>Price</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="foot" id="row-count">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <h3 id="modal-title">Add trainer</h3>
+    <p class="modal-sub">Add basics + URL, then click <strong>Auto-fill from web</strong> to populate specs.</p>
+
+    <div class="fetch-block">
+      <label>Source URL (brand or retailer product page)</label>
+      <div class="fetch-row">
+        <input type="text" id="f-source-url" placeholder="https://www.hoka.com/en/gb/mens-road/clifton-9/..." />
+        <button class="btn" id="fetch-btn">Auto-fill from web</button>
+      </div>
+      <div class="fetch-status" id="fetch-status"></div>
+    </div>
+
+    <div class="grid2">
+      <div class="field"><label>Brand *</label>
+        <select id="f-brand-in"></select>
+      </div>
+      <div class="field"><label>Model *</label>
+        <input type="text" id="f-model" placeholder="Clifton 9" />
+      </div>
+      <div class="field full"><label>Display name <span class="hint">(auto-built if blank)</span></label>
+        <input type="text" id="f-name" placeholder="HOKA Clifton 9" />
+      </div>
+      <div class="field"><label>Terrain</label>
+        <select id="f-terrain-in"><option value="">—</option><option>Road</option><option>Trail</option><option>Both</option></select>
+      </div>
+      <div class="field"><label>Run type</label>
+        <select id="f-runtype">
+          <option value="">—</option>
+          <option>Daily</option><option>Tempo</option><option>Race</option>
+          <option>Long run</option><option>Recovery</option><option>Trail</option>
+        </select>
+      </div>
+      <div class="field"><label>Drop (mm)</label><input type="number" id="f-drop" step="0.5" /></div>
+      <div class="field"><label>Stack (mm)</label><input type="number" id="f-stack" step="0.5" /></div>
+      <div class="field"><label>Weight (g)</label><input type="number" id="f-weight" /></div>
+      <div class="field"><label>Foot width</label>
+        <select id="f-width"><option value="">—</option><option>Narrow</option><option value="Regular" selected>Regular</option><option>Wide</option><option>All</option></select>
+      </div>
+      <div class="field full"><label>Hero image URL</label><input type="text" id="f-image" placeholder="https://…" /></div>
+      <div class="field full"><label>Blurb <span class="hint">(short marketing line on the trainer card)</span></label>
+        <textarea id="f-blurb" placeholder="A plush, lightweight daily trainer with HOKA's signature rocker geometry…"></textarea>
+      </div>
+      <div class="field"><label>Status</label>
+        <select id="f-status-in"><option value="draft">Draft</option><option value="active">Active</option><option value="archived">Archived</option></select>
+      </div>
+      <div class="field"><label>Visible on frontend</label>
+        <select id="f-visible"><option value="false">No</option><option value="true">Yes</option></select>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-danger left hidden" id="delete-btn">Delete trainer</button>
+      <button class="btn" id="cancel-btn">Cancel</button>
+      <button class="btn btn-primary" id="save-btn">Save trainer</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  // ============================================================
+  // API helpers
+  // ============================================================
+  const API = '';
+  let ADMIN_KEY = sessionStorage.getItem('siq_admin_key') || '';
+
+  async function api(path, opts = {}) {
+    const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+    if (ADMIN_KEY) headers['X-Admin-Key'] = ADMIN_KEY;
+    const res = await fetch(API + path, { ...opts, headers });
+    if (res.status === 401) {
+      sessionStorage.removeItem('siq_admin_key');
+      location.reload();
+      throw new Error('Unauthorized');
+    }
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || res.statusText);
+    }
+    if (res.status === 204) return null;
+    return res.json();
+  }
+
+  // ============================================================
+  // Auth gate
+  // ============================================================
+  const gate = document.getElementById('gate');
+  const app = document.getElementById('app');
+  const gateKey = document.getElementById('gate-key');
+  const gateErr = document.getElementById('gate-err');
+
+  async function tryUnlock(key) {
+    gateErr.textContent = '';
+    ADMIN_KEY = key;
+    try {
+      // Hit any admin-protected endpoint to validate the key
+      await api('/trainers/_auth_check');
+      sessionStorage.setItem('siq_admin_key', key);
+      gate.classList.add('hidden');
+      app.classList.remove('hidden');
+      await boot();
+    } catch (e) {
+      ADMIN_KEY = '';
+      gateErr.textContent = 'Invalid admin key. Try again.';
+    }
+  }
+
+  document.getElementById('gate-submit').addEventListener('click', () => tryUnlock(gateKey.value.trim()));
+  gateKey.addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(gateKey.value.trim()); });
+
+  // If we already have a key in session, try it
+  if (ADMIN_KEY) tryUnlock(ADMIN_KEY); else gateKey.focus();
+
+  // ============================================================
+  // State
+  // ============================================================
+  let trainers = [];
+  let brands = [];
+  let editingId = null;
+  let filters = { q: '', brand: '', terrain: '', status: '' };
+
+  const $ = id => document.getElementById(id);
+
+  // ============================================================
+  // Boot
+  // ============================================================
+  async function boot() {
+    setApiStatus('ok', 'Connected');
+    await loadBrands();
+    await loadTrainers();
+  }
+
+  function setApiStatus(state, text) {
+    $('api-dot').className = 'status-dot ' + (state === 'ok' ? 'ok' : state === 'err' ? 'err' : '');
+    $('api-text').textContent = text;
+  }
+
+  async function loadBrands() {
+    brands = await api('/brands');
+    const filterSel = $('f-brand');
+    const inputSel = $('f-brand-in');
+    filterSel.innerHTML = '<option value="">All brands</option>' +
+      brands.map(b => `<option value="${b.name}">${b.name}</option>`).join('');
+    inputSel.innerHTML = brands.map(b => `<option value="${b.name}">${b.name}</option>`).join('');
+  }
+
+  async function loadTrainers() {
+    try {
+      trainers = await api('/trainers?include_drafts=true');
+      render();
+    } catch (e) {
+      toast('Failed to load trainers', 'error');
+      console.error(e);
+    }
+  }
+
+  // ============================================================
+  // Render
+  // ============================================================
+  function renderMetrics() {
+    const total = trainers.length;
+    const active = trainers.filter(t => t.status === 'active').length;
+    const visible = trainers.filter(t => t.visible_on_frontend && t.status === 'active').length;
+    const drafts = trainers.filter(t => t.status === 'draft').length;
+    const prices = trainers.map(t => t.best_price).filter(p => p != null);
+    const avgPrice = prices.length ? Math.round(prices.reduce((s,p) => s+p, 0) / prices.length) : 0;
+    $('metrics').innerHTML = `
+      <div class="metric accent"><div class="metric-label">Live on frontend</div><div class="metric-value">${visible}</div></div>
+      <div class="metric"><div class="metric-label">Total trainers</div><div class="metric-value">${total}</div></div>
+      <div class="metric"><div class="metric-label">Active</div><div class="metric-value">${active}</div></div>
+      <div class="metric"><div class="metric-label">Drafts</div><div class="metric-value">${drafts}</div></div>
+      <div class="metric"><div class="metric-label">Avg price</div><div class="metric-value">${avgPrice ? '£'+avgPrice : '—'}</div></div>
+    `;
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function renderRows() {
+    const q = filters.q.toLowerCase();
+    const filtered = trainers.filter(t => {
+      if (filters.brand && t.brand !== filters.brand) return false;
+      if (filters.terrain && t.terrain !== filters.terrain) return false;
+      if (filters.status && t.status !== filters.status) return false;
+      if (q) {
+        const hay = `${t.display_name} ${t.brand} ${t.model}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+    const tbody = $('rows');
+    if (!filtered.length) {
+      tbody.innerHTML = `<tr><td colspan="8" class="empty">
+        <strong>${trainers.length ? 'No trainers match these filters' : 'No trainers yet'}</strong>
+        ${trainers.length ? 'Try clearing search or filters.' : 'Click <em>Add trainer</em> to get started.'}
+      </td></tr>`;
+    } else {
+      tbody.innerHTML = filtered.map(t => {
+        const tp = t.terrain === 'Road' ? 'pill-road' : t.terrain === 'Trail' ? 'pill-trail' : 'pill-both';
+        const sp = 'pill-' + (t.status || 'draft');
+        const thumb = t.hero_image_url
+          ? `<div class="thumb" style="background-image:url('${esc(t.hero_image_url)}')"></div>`
+          : `<div class="thumb">👟</div>`;
+        const price = t.best_price != null
+          ? `£${Number(t.best_price).toFixed(0)}`
+          : `<span class="price-stale">—</span>`;
+        return `
+          <tr class="${t.status === 'draft' ? 'draft' : ''}">
+            <td>
+              <div class="name-cell">
+                ${thumb}
+                <div class="name-text">
+                  <div class="name-model">${esc(t.display_name)}</div>
+                  <div class="name-brand">${esc(t.brand)} · ${esc(t.model)}</div>
+                </div>
+              </div>
+            </td>
+            <td>${t.terrain ? `<span class="pill ${tp}">${esc(t.terrain)}</span>` : '—'}</td>
+            <td>${esc(t.run_type) || '—'}</td>
+            <td>${t.drop_mm != null ? t.drop_mm + 'mm' : '—'}</td>
+            <td>${t.stack_mm != null ? t.stack_mm + 'mm' : '—'}</td>
+            <td>${t.weight_g ? t.weight_g + 'g' : '—'}</td>
+            <td class="price">${price}</td>
+            <td>
+              <span class="pill ${sp}">${esc(t.status)}</span>
+              <span style="float: right;">
+                <button class="icon-btn" data-edit="${t.id}" title="Edit">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                </button>
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      tbody.querySelectorAll('[data-edit]').forEach(b =>
+        b.addEventListener('click', () => openModal(b.dataset.edit)));
+    }
+    $('row-count').textContent = `Showing ${filtered.length} of ${trainers.length} trainers`;
+  }
+
+  function render() { renderMetrics(); renderRows(); }
+
+  // ============================================================
+  // Modal
+  // ============================================================
+  function openModal(id) {
+    editingId = id || null;
+    const t = id ? trainers.find(x => x.id === id) : null;
+    $('modal-title').textContent = id ? 'Edit trainer' : 'Add trainer';
+    $('delete-btn').classList.toggle('hidden', !id);
+    $('f-source-url').value = '';
+    $('fetch-status').textContent = '';
+    $('fetch-status').className = 'fetch-status';
+    $('f-brand-in').value = t?.brand || (brands[0]?.name || '');
+    $('f-model').value = t?.model || '';
+    $('f-name').value = t?.display_name || '';
+    $('f-terrain-in').value = t?.terrain || '';
+    $('f-runtype').value = t?.run_type || '';
+    $('f-drop').value = t?.drop_mm ?? '';
+    $('f-stack').value = t?.stack_mm ?? '';
+    $('f-weight').value = t?.weight_g ?? '';
+    $('f-width').value = t?.foot_width || 'Regular';
+    $('f-image').value = t?.hero_image_url || '';
+    $('f-blurb').value = t?.blurb || '';
+    $('f-status-in').value = t?.status || 'draft';
+    $('f-visible').value = String(t?.visible_on_frontend === true);
+    $('modal-bg').classList.add('open');
+  }
+
+  function closeModal() { $('modal-bg').classList.remove('open'); editingId = null; }
+
+  async function saveTrainer() {
+    const brand = $('f-brand-in').value;
+    const model = $('f-model').value.trim();
+    if (!brand || !model) { toast('Brand and model are required', 'error'); return; }
+    const payload = {
+      brand, model,
+      display_name: $('f-name').value.trim() || `${brand} ${model}`,
+      terrain: $('f-terrain-in').value || null,
+      run_type: $('f-runtype').value || null,
+      drop_mm: $('f-drop').value === '' ? null : Number($('f-drop').value),
+      stack_mm: $('f-stack').value === '' ? null : Number($('f-stack').value),
+      weight_g: $('f-weight').value === '' ? null : Number($('f-weight').value),
+      foot_width: $('f-width').value || null,
+      hero_image_url: $('f-image').value.trim() || null,
+      blurb: $('f-blurb').value.trim() || null,
+      status: $('f-status-in').value,
+      visible_on_frontend: $('f-visible').value === 'true',
+    };
+    try {
+      if (editingId) {
+        await api(`/trainers/${editingId}`, { method: 'PATCH', body: JSON.stringify(payload) });
+        toast('Trainer updated', 'success');
+      } else {
+        await api('/trainers', { method: 'POST', body: JSON.stringify(payload) });
+        toast('Trainer added', 'success');
+      }
+      closeModal();
+      await loadTrainers();
+    } catch (e) {
+      toast('Save failed: ' + e.message.slice(0, 80), 'error');
+    }
+  }
+
+  async function deleteTrainer() {
+    if (!editingId) return;
+    if (!confirm('Delete this trainer? This cannot be undone.')) return;
+    try {
+      await api(`/trainers/${editingId}`, { method: 'DELETE' });
+      toast('Trainer deleted', 'success');
+      closeModal();
+      await loadTrainers();
+    } catch (e) {
+      toast('Delete failed: ' + e.message.slice(0, 80), 'error');
+    }
+  }
+
+  // ============================================================
+  // Auto-fill from URL
+  // ============================================================
+  async function autoFill() {
+    const url = $('f-source-url').value.trim();
+    const statusEl = $('fetch-status');
+    if (!url) {
+      statusEl.textContent = 'Paste a URL first.';
+      statusEl.className = 'fetch-status err';
+      return;
+    }
+    statusEl.textContent = 'Fetching…';
+    statusEl.className = 'fetch-status';
+    try {
+      const data = await api('/trainers/_autofill', {
+        method: 'POST', body: JSON.stringify({ url })
+      });
+      // Only fill empty fields — never clobber typed-in values
+      const setIfEmpty = (id, val) => { if (val && !$(id).value) $(id).value = val; };
+      setIfEmpty('f-name', data.title);
+      setIfEmpty('f-image', data.image);
+      setIfEmpty('f-blurb', data.description);
+      if (data.weight_g && !$('f-weight').value) $('f-weight').value = data.weight_g;
+      if (data.drop_mm && !$('f-drop').value) $('f-drop').value = data.drop_mm;
+      if (data.stack_mm && !$('f-stack').value) $('f-stack').value = data.stack_mm;
+
+      const found = Object.entries(data).filter(([k,v]) => v).map(([k]) => k);
+      statusEl.textContent = found.length
+        ? `Found: ${found.join(', ')}. Check & adjust before saving.`
+        : 'Nothing usable found on that page. Fill manually.';
+      statusEl.className = 'fetch-status ' + (found.length ? 'ok' : 'err');
+    } catch (e) {
+      statusEl.textContent = 'Fetch failed — that site likely blocks bots. Fill manually.';
+      statusEl.className = 'fetch-status err';
+    }
+  }
+
+  // ============================================================
+  // Refresh prices
+  // ============================================================
+  async function refreshPrices() {
+    const btn = $('refresh-btn');
+    btn.disabled = true;
+    btn.textContent = 'Refreshing…';
+    try {
+      const result = await api('/trainers/refresh', { method: 'POST' });
+      toast(`Refreshed ${result.refreshed} listings, ${result.changed} price changes`, 'success');
+      await loadTrainers();
+    } catch (e) {
+      // Most likely "Awin not configured yet" — friendly message
+      toast('Refresh unavailable — Awin not connected yet', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></svg> Refresh prices';
+    }
+  }
+
+  // ============================================================
+  // Toast
+  // ============================================================
+  let toastTimer = null;
+  function toast(msg, kind) {
+    const el = $('toast');
+    el.textContent = msg;
+    el.className = 'toast show ' + (kind || '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.className = 'toast ' + (kind || ''), 3000);
+  }
+
+  // ============================================================
+  // Event wiring
+  // ============================================================
+  $('add-btn').addEventListener('click', () => openModal(null));
+  $('cancel-btn').addEventListener('click', closeModal);
+  $('save-btn').addEventListener('click', saveTrainer);
+  $('delete-btn').addEventListener('click', deleteTrainer);
+  $('fetch-btn').addEventListener('click', autoFill);
+  $('refresh-btn').addEventListener('click', refreshPrices);
+  $('modal-bg').addEventListener('click', e => { if (e.target === $('modal-bg')) closeModal(); });
+  $('q').addEventListener('input', e => { filters.q = e.target.value; renderRows(); });
+  $('f-brand').addEventListener('change', e => { filters.brand = e.target.value; renderRows(); });
+  $('f-terrain').addEventListener('change', e => { filters.terrain = e.target.value; renderRows(); });
+  $('f-status').addEventListener('change', e => { filters.status = e.target.value; renderRows(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+})();
+</script>
+</body>
+</html>

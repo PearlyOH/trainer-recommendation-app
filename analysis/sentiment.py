@@ -4,6 +4,20 @@ from datetime import datetime
 from services.sheets_service import SheetsService
 from config.settings import SHEET_CLEAN_DATA, SHEET_SENTIMENT
 
+TRAINER_MODEL_COL_ALT = "What's the brand and model of this trainer? e.g. Nike Pegasus 40 or Adidas Adizero Pro 4"
+
+
+def _resolve_column(df, preferred_name, *keywords):
+    if preferred_name in df.columns:
+        return preferred_name
+    key = [k.lower() for k in keywords]
+    for col in df.columns:
+        c = str(col).lower()
+        if all(k in c for k in key):
+            return col
+    return None
+
+
 def analyze_sentiment():
     """Analyze sentiment from qualitative feedback"""
     print("Analyzing sentiment...")
@@ -13,8 +27,13 @@ def analyze_sentiment():
     # Read clean data
     df = sheets.read_to_dataframe(SHEET_CLEAN_DATA)
     
-    # Text columns to analyze
-    text_cols = ["Post Run Feel", "Pain Experienced", "Improvement Suggestions"]
+    # Text columns to analyze (resolve long/raw headers when clean names are absent)
+    text_cols = [
+        _resolve_column(df, "Post Run Feel", "typical", "run", "feel"),
+        _resolve_column(df, "Pain Experienced", "pain", "discomfort"),
+        _resolve_column(df, "Improvement Suggestions", "magic", "wand"),
+    ]
+    text_cols = [c for c in text_cols if c is not None]
     
     # Sentiment analysis function
     def get_sentiment(text):
@@ -46,12 +65,17 @@ def analyze_sentiment():
         df["Overall Subjectivity"] = None
     
     # Aggregate by trainer model
-    if 'Overall Polarity' in df.columns and 'Overall Subjectivity' in df.columns and 'Trainer Model' in df.columns:
+    trainer_col = "Trainer Model" if "Trainer Model" in df.columns else (
+        TRAINER_MODEL_COL_ALT if TRAINER_MODEL_COL_ALT in df.columns else _resolve_column(df, "Trainer Model", "brand", "model")
+    )
+
+    if 'Overall Polarity' in df.columns and 'Overall Subjectivity' in df.columns and trainer_col:
         sentiment_summary = (
-            df[["Trainer Model", "Overall Polarity", "Overall Subjectivity"]]
-            .groupby("Trainer Model")
+            df[[trainer_col, "Overall Polarity", "Overall Subjectivity"]]
+            .groupby(trainer_col)
             .mean()
             .reset_index()
+            .rename(columns={trainer_col: "Trainer Model"})
         )
         
         # Write to Sentiment Analysis sheet

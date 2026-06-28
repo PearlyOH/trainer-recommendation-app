@@ -10,8 +10,19 @@ from analysis.usage_patterns import analyze_usage_patterns
 from analysis.recommendations import get_recommendations
 from services.sheets_service import SheetsService
 from config.settings import SHEET_CLEAN_DATA
-
-app = FastAPI(title="Trainer Recommendation API")
+from contextlib import asynccontextmanager
+from services.trainers_api import (
+    router as trainers_router,
+    admin_router,
+    init_db_pool,
+    close_db_pool,
+)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await init_db_pool()
+    yield
+    await close_db_pool()
+app = FastAPI(title="Trainer Recommendation API", lifespan=lifespan)
 
 # Enable CORS so your React frontend can call this API
 app.add_middleware(
@@ -21,7 +32,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+# Trainer catalogue routes (Neon-backed)
+app.include_router(trainers_router)
+app.include_router(admin_router)
 # Request model for recommendations
 class RecommendationRequest(BaseModel):
     run_goal: str  # "Beginner/Walk", "First 5k", "Comfy/Long Run", "Speed/Tempo"

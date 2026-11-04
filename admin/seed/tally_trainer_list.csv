@@ -1,58 +1,58 @@
-brand,model,terrain,run_type,source_url,page_is_for,weight_g,drop_mm,stack_mm
-adidas,Adizero Boston,Road,Tempo,https://www.adidas.com/us/adizero-boston-13-shoes/JS4938.html,Adizero Boston 13,,,
-adidas,Adizero Pro,Road,Race,https://www.adidas.com/us/adizero-adios-pro-4-shoes/KJ7036.html,Adizero Adios Pro 4,,,
-adidas,Adizero SL,Road,Tempo,https://www.adidas.com/us/adizero-sl2-shoes/JI2994.html,Adizero SL2,238,9,36
-adidas,Runfalcon,Road,Daily,https://www.adidas.com/us/runfalcon-5-running-shoes/IH7758.html,Runfalcon 5,,,
-adidas,Supernova,Road,Daily,https://www.adidas.co.uk/supernova-rise-2-running-shoes/JQ7699.html,Supernova Rise 2,,10,
-adidas,Terrex Agravic,Trail,Trail,https://www.adidas.co.uk/terrex-agravic-3-trail-running-shoes/ID0343.html,Terrex Agravic 3,,,
-ASICS,GEL-Cumulus,Road,Daily,https://www.asics.com/us/en-us/gel-cumulus--27/p/ANA_1011B960-101.html,GEL-CUMULUS 27,265,8,
-ASICS,GEL-Kayano,Road,Daily,https://www.asics.com/us/en-us/gel-kayano-32/p/ANA_1011C052-401.html,GEL-KAYANO 32,300,8,
-ASICS,GEL-Nimbus,Road,Daily,https://www.asics.com/ca/en-ca/gel-nimbus-27-1011b958-100,GEL-NIMBUS 27,305,8,
-ASICS,GEL-Trabuco,Trail,Daily,https://www.asics.com/gb/en-gb/gel-trabuco-13/p/1011B973-020.html,GEL-TRABUCO 13,285,8,35.5
-ASICS,GT-2000,Road,Daily,https://www.asics.com/us/en-us/gt-2000-14/p/ANA_1011C056-021.html,GT-2000 14,270,8,
-ASICS,Magic Speed,Road,Tempo,https://www.asics.com/us/en-us/magic-speed-4/p/ANA_1011B875-750.html,MAGIC SPEED 4,242,8,
-ASICS,Metaspeed Sky,Road,Race,https://www.asics.com/no/en-no/metaspeed-sky-tokyo/p/1013A162-400.html,METASPEED SKY TOKYO,170,5,39.5
-ASICS,Novablast,Road,Daily,https://www.asics.com/gb/en-gb/novablast-5/p/1011B974-002.html,NOVABLAST 5,255,8,
-Brooks,Adrenaline GTS,Road,Daily,https://www.brooksrunning.com/en_us/mens/shoes/road-running-shoes/adrenaline-gts-24/110437.html,Adrenaline GTS 24,284,12,
-Brooks,Ghost,Road,Daily,https://www.brooksrunning.com/en_us/mens/shoes/road-running-shoes/ghost-17/1104422E090.095.html,Ghost 17,286,10,
-Brooks,Glycerin,Road,Daily,https://www.brooksrunning.com/en_us/mens/shoes/road-running-shoes/glycerin-22/110445.html,Glycerin 22,289,10,
-HOKA,Bondi,Road,Daily,https://www.hoka.com/en/us/mens-everyday-running-shoes/bondi-9/1162011.html,Bondi 9,298,5,43
-HOKA,Clifton,Road,Daily,https://www.hoka.com/en/us/mens-everyday-running-gear/clifton-10/1162030.html,Clifton 10,278,8,42
-HOKA,Gaviota,Road,Daily,https://www.hoka.com/en/gb/men-road/gaviota-6/1171932.html,Gaviota 6,291,6,
-HOKA,Mach,Road,Tempo,https://www.hoka.com/en/us/men/mach-6/1147790.html,Mach 6,232,5,
-HOKA,Mafate,Trail,Trail,https://www.hoka.com/en/gb/men-trail/mafate-5/1168722.html,Mafate 5,332,8,
-HOKA,Rincon,Road,Daily,https://www.hoka.com/en/us/mens-everyday-running-shoes/rincon-4/1155130.html,Rincon 4,228,5,
-HOKA,Speedgoat,Trail,Trail,https://www.hoka.com/en/us/mens-trail/speedgoat-6/1147791.html,Speedgoat 6,278,5,
-New Balance,Fresh Foam 880,Road,Daily,https://www.newbalance.co.uk/pd/fresh-foam-x-880v15/M880V15-48603.html,Fresh Foam X 880v15,299,6,
-New Balance,Fresh Foam 1080,Road,Daily,https://www.newbalance.co.uk/pd/fresh-foam-x-1080-v14/M1080V14-47512.html,Fresh Foam X 1080v14,298,6,
-New Balance,FuelCell Rebel,Road,Tempo,https://www.newbalance.co.uk/pd/fuelcell-rebel-v5/MFCXV5-50690.html,FuelCell Rebel v5,223,6,
-New Balance,FuelCell SuperComp Elite,Road,Race,https://www.newbalance.com/pd/fuelcell-supercomp-elite-v4/MRCELV4-46422-PMG-NA.html,FuelCell SuperComp Elite v4,,,
-Nike,Alphafly,Road,Race,https://www.nike.com/t/alphafly-3-mens-road-racing-shoes-5gZBgL/II7290-100,Alphafly 3,218,8,
-Nike,Invincible,Road,Daily,https://www.nike.com/ch/en/t/invincible-3-road-running-shoes-0r1MPB,Invincible 3,309,9,
-Nike,Pegasus,Road,Daily,https://www.nike.com/gb/t/pegasus-41-road-running-shoes-SPAsRL1w,Pegasus 41,297,10,
-Nike,Pegasus Trail,Trail,Daily,https://www.nike.com/t/pegasus-trail-5-mens-trail-running-shoes-0ZrZ4D/DV3864-002,Pegasus Trail 5,300,9.5,
-Nike,Structure,Road,Daily,https://www.nike.com/gb/t/structure-26-mens-road-running-shoes-DyK0ML90,Structure 26,321,10,
-Nike,Vaporfly,Road,Race,https://www.nike.com/t/vaporfly-4-mens-road-racing-shoes-HK05JWOf,Vaporfly 4,,,
-Nike,Vomero,Road,Daily,https://www.nike.com/t/vomero-18-mens-road-running-shoes-NzWnvcC8,Vomero 18,325,10,46
-Nike,Wildhorse,Trail,Daily,https://www.nike.com/gb/t/wildhorse-10-mens-trail-running-shoes-6RHZHLQc,Wildhorse 10,311,9.5,
-Nike,Zegama,Trail,Trail,https://www.nike.com/ie/t/zegama-trail-2-trail-running-shoes-VP1Pxw,Zegama Trail 2,320,4,
-Nike,Zoom Fly,Road,Tempo,https://www.nike.com/t/zoom-fly-6-mens-road-racing-shoes-wn2ALjkm/IQ9405-411,Zoom Fly 6,265,8,
-On,Cloudboom,Road,Race,https://www.on.com/en-us/products/cloudboom-strike-ls-u-3ue3001,LightSpray Cloudboom Strike,,,
-On,Cloudmonster,Road,Daily,https://www.on.com/en-us/products/cloudmonster-2-m-3me1012/mens/black-glacier-shoes-3ME10120777,Cloudmonster 2,300,6,
-On,Cloudrunner,Road,Daily,https://www.on.com/en-us/products/cloudrunner-2-m-3me1014/mens/eclipse-black-shoes-3ME10140264,Cloudrunner 2,,,
-On,Cloudsurfer,Road,Daily,https://www.on.com/en-us/products/cloudsurfer-next-3me3002,Cloudsurfer Next,,,
-On,Cloudultra,Trail,Trail,https://www.on.com/en-us/products/cloudultra-3-m-3mf3023,Cloudultra 3,,,
-On,Cloudvista,Both,Daily,https://www.on.com/en-us/products/cloudvista-2-3me3011/mens,Cloudvista 2,,,
-PUMA,Velocity Nitro,Road,Daily,https://us.puma.com/us/en/pd/velocity-nitro-4-mens-road-running-shoes/311140,Velocity NITRO 4,,10,36
-Reebok,FloatZig,Road,Daily,https://www.reebok.com/products/reebok-mens-floatzig-1-shoes-chalk-sand-golden-haze-117470,FloatZig 1,278,6,31
-Salomon,Genesis,Trail,Trail,https://www.salomon.com/en-us/product/genesis-2-li9180,Genesis 2,,8,
-Salomon,Sense Ride,Trail,Daily,https://www.salomon.com/en-ca/product/sense-ride-5-li3121,Sense Ride 5,293,8,
-Salomon,Speedcross,Trail,Daily,https://www.salomon.com/en-us/product/speedcross-6-lg9212,Speedcross 6,312,10,
-Saucony,Endorphin Pro,Road,Race,https://www.saucony.com/UK/en_GB/endorphin-pro-4/58850M.html,Endorphin Pro 4,212,8,
-Saucony,Endorphin Speed,Road,Tempo,https://www.saucony.com/en/endorphin-speed-5/60307M.html,Endorphin Speed 5,237,,
-Saucony,Guide,Road,Daily,https://www.saucony.com/UK/en_GB/guide-18/59947M.html,Guide 18,272,6,
-Saucony,Peregrine,Trail,Daily,,(no men's page found),,,
-Saucony,Ride,Road,Daily,https://www.saucony.com/UK/en_GB/ride-18/59943M.html,Ride 18,259,8,
-Saucony,Triumph,Road,Daily,https://www.saucony.com/UK/en_GB/triumph-23/60311M.html,Triumph 23,263,10,
-Under Armour,Infinite,Road,Daily,https://www.underarmour.co.uk/en-gb/p/running/ua_infinite_elite_2_mens_running_shoes/3028169.html,UA Infinite Elite 2,290,8,36
-Under Armour,Velociti,Road,Tempo,https://www.underarmour.com/en-us/p/ua_velociti_pace_mens_running_shoes/6009107.html,UA Velociti Pace,,,
+brand,model,terrain,run_type,source_url,page_is_for,weight_g,drop_mm,stack_mm,blurb
+adidas,Adizero Boston,Road,Tempo,https://www.adidas.com/us/adizero-boston-13-shoes/JS4938.html,Adizero Boston 13,,,,"A fast training shoe for tempo runs and workouts, with Lightstrike Pro foam and ENERGYRODS for a snappy, propulsive feel."
+adidas,Adizero Pro,Road,Race,https://www.adidas.com/us/adizero-adios-pro-4-shoes/KJ7036.html,Adizero Adios Pro 4,,,,"adidas's marathon racing shoe, pairing Lightstrike Pro foam with carbon-infused ENERGYRODS and a rocker shape for race-day speed."
+adidas,Adizero SL,Road,Tempo,https://www.adidas.com/us/adizero-sl2-shoes/JI2994.html,Adizero SL2,238,9,36,"A lightweight, neutral trainer for everyday speed, with a layered Lightstrike Pro and Lightstrike 2.0 midsole for cushioning and energy return."
+adidas,Runfalcon,Road,Daily,https://www.adidas.com/us/runfalcon-5-running-shoes/IH7758.html,Runfalcon 5,,,,"An affordable everyday running shoe with soft Cloudfoam cushioning, a breathable mesh upper and a hard-wearing Adiwear outsole."
+adidas,Supernova,Road,Daily,https://www.adidas.co.uk/supernova-rise-2-running-shoes/JQ7699.html,Supernova Rise 2,,10,,A comfortable neutral daily trainer with a full-length Dreamstrike+ midsole and Support Rods to guide each stride.
+adidas,Terrex Agravic,Trail,Trail,https://www.adidas.co.uk/terrex-agravic-3-trail-running-shoes/ID0343.html,Terrex Agravic 3,,,,"A versatile trail shoe balancing comfort, durability and stability, with a Lightstrike midsole and Continental rubber lugs for grip in wet and dry conditions."
+ASICS,GEL-Cumulus,Road,Daily,https://www.asics.com/us/en-us/gel-cumulus--27/p/ANA_1011B960-101.html,GEL-CUMULUS 27,265,8,,A versatile neutral daily trainer with soft FF BLAST PLUS foam and PureGEL cushioning for comfortable miles at any distance.
+ASICS,GEL-Kayano,Road,Daily,https://www.asics.com/us/en-us/gel-kayano-32/p/ANA_1011C052-401.html,GEL-KAYANO 32,300,8,,"ASICS's premier stability shoe, combining a tall FF BLAST PLUS midsole with the 4D Guidance System for supportive, cushioned miles."
+ASICS,GEL-Nimbus,Road,Daily,https://www.asics.com/ca/en-ca/gel-nimbus-27-1011b958-100,GEL-NIMBUS 27,305,8,,"ASICS's flagship neutral cushioned shoe, with FF BLAST PLUS ECO foam and rearfoot PureGEL for a soft, comfortable ride on long runs."
+ASICS,GEL-Trabuco,Trail,Daily,https://www.asics.com/gb/en-gb/gel-trabuco-13/p/1011B973-020.html,GEL-TRABUCO 13,285,8,35.5,"An all-round trail shoe with FF BLAST PLUS ECO cushioning, a rock protection plate and ASICSGRIP rubber for grip in changing conditions."
+ASICS,GT-2000,Road,Daily,https://www.asics.com/us/en-us/gt-2000-14/p/ANA_1011C056-021.html,GT-2000 14,270,8,,"A stability daily trainer with an FF BLAST MAX midsole and rearfoot PureGEL for soft, supportive everyday runs."
+ASICS,Magic Speed,Road,Tempo,https://www.asics.com/us/en-us/magic-speed-4/p/ANA_1011B875-750.html,MAGIC SPEED 4,242,8,,"A fast tempo and race shoe with FF TURBO foam and a sculpted carbon plate for an energetic, stable toe-off."
+ASICS,Metaspeed Sky,Road,Race,https://www.asics.com/no/en-no/metaspeed-sky-tokyo/p/1013A162-400.html,METASPEED SKY TOKYO,170,5,39.5,"A carbon-plated race shoe for stride-style runners, combining FF LEAP and FF TURBO PLUS foams for high energy return at around 170g."
+ASICS,Novablast,Road,Daily,https://www.asics.com/gb/en-gb/novablast-5/p/1011B974-002.html,NOVABLAST 5,255,8,,"A bouncy neutral daily trainer with FF BLAST MAX foam and a trampoline-inspired outsole for a lively, highly cushioned ride."
+Brooks,Adrenaline GTS,Road,Daily,https://www.brooksrunning.com/en_us/mens/shoes/road-running-shoes/adrenaline-gts-24/110437.html,Adrenaline GTS 24,284,12,,"A supportive daily trainer with GuideRails support and nitrogen-infused DNA LOFT v3 cushioning for a soft, stable ride."
+Brooks,Ghost,Road,Daily,https://www.brooksrunning.com/en_us/mens/shoes/road-running-shoes/ghost-17/1104422E090.095.html,Ghost 17,286,10,,"A balanced, neutral daily trainer with nitrogen-infused cushioning in the heel and forefoot and a breathable air mesh upper."
+Brooks,Glycerin,Road,Daily,https://www.brooksrunning.com/en_us/mens/shoes/road-running-shoes/glycerin-22/110445.html,Glycerin 22,289,10,,"A plush, neutral road shoe with nitrogen-infused DNA Tuned foam, built for comfortable easy days and long runs."
+HOKA,Bondi,Road,Daily,https://www.hoka.com/en/us/mens-everyday-running-shoes/bondi-9/1162011.html,Bondi 9,298,5,43,"HOKA's max-cushioned road shoe, with a taller stack of supercritical foam for a soft, resilient ride on easy and long runs."
+HOKA,Clifton,Road,Daily,https://www.hoka.com/en/us/mens-everyday-running-gear/clifton-10/1162030.html,Clifton 10,278,8,42,"A plush, neutral daily trainer with extra heel cushioning and an 8mm drop for a smooth ride and a snappier toe-off."
+HOKA,Gaviota,Road,Daily,https://www.hoka.com/en/gb/men-road/gaviota-6/1171932.html,Gaviota 6,291,6,,"A plush stability shoe with HOKA's H-Frame, designed to limit overpronation without overcorrecting your stride."
+HOKA,Mach,Road,Tempo,https://www.hoka.com/en/us/men/mach-6/1147790.html,Mach 6,232,5,,"HOKA's lightest, most responsive Mach yet, with a supercritical foam midsole for fast training days."
+HOKA,Mafate,Trail,Trail,https://www.hoka.com/en/gb/men-trail/mafate-5/1168722.html,Mafate 5,332,8,,"HOKA's most technical ultra-distance trail shoe, with a dual-density midsole, Vibram Megagrip and 5mm lugs."
+HOKA,Rincon,Road,Daily,https://www.hoka.com/en/us/mens-everyday-running-shoes/rincon-4/1155130.html,Rincon 4,228,5,,"A lightweight daily trainer with cloud-weight cushioning, upgraded rebound foam and a foot-hugging fit."
+HOKA,Speedgoat,Trail,Trail,https://www.hoka.com/en/us/mens-trail/speedgoat-6/1147791.html,Speedgoat 6,278,5,,"HOKA's flagship trail shoe, with a breathable woven upper, cushioned ride and revised lugs for grip on varied terrain."
+New Balance,Fresh Foam 880,Road,Daily,https://www.newbalance.co.uk/pd/fresh-foam-x-880v15/M880V15-48603.html,Fresh Foam X 880v15,299,6,,"A neutral, well-cushioned daily trainer with a soft Fresh Foam X midsole, built for everyday and long runs."
+New Balance,Fresh Foam 1080,Road,Daily,https://www.newbalance.co.uk/pd/fresh-foam-x-1080-v14/M1080V14-47512.html,Fresh Foam X 1080v14,298,6,,"A highly cushioned daily trainer with a soft Fresh Foam X midsole and rocker shape for smooth, comfortable miles."
+New Balance,FuelCell Rebel,Road,Tempo,https://www.newbalance.co.uk/pd/fuelcell-rebel-v5/MFCXV5-50690.html,FuelCell Rebel v5,223,6,,"A lightweight, lively trainer for everyday and quick runs, with a PEBA and EVA FuelCell midsole for soft, bouncy cushioning."
+New Balance,FuelCell SuperComp Elite,Road,Race,https://www.newbalance.com/pd/fuelcell-supercomp-elite-v4/MRCELV4-46422-PMG-NA.html,FuelCell SuperComp Elite v4,,,,"New Balance's elite road racing shoe, built around FuelCell foam and a carbon plate for race-day speed."
+Nike,Alphafly,Road,Race,https://www.nike.com/t/alphafly-3-mens-road-racing-shoes-5gZBgL/II7290-100,Alphafly 3,218,8,,"Nike's pinnacle marathon racing shoe, with a full-length carbon Flyplate, ZoomX foam and two forefoot Air Zoom units."
+Nike,Invincible,Road,Daily,https://www.nike.com/ch/en/t/invincible-3-road-running-shoes-0r1MPB,Invincible 3,309,9,,"A max-cushioned road shoe with a high, wide ZoomX midsole and a Flyknit upper for soft, supportive easy miles."
+Nike,Pegasus,Road,Daily,https://www.nike.com/gb/t/pegasus-41-road-running-shoes-SPAsRL1w,Pegasus 41,297,10,,"Nike's go-to neutral daily trainer, with responsive ReactX foam and heel and forefoot Air Zoom units for a smooth, springy ride."
+Nike,Pegasus Trail,Trail,Daily,https://www.nike.com/t/pegasus-trail-5-mens-trail-running-shoes-0ZrZ4D/DV3864-002,Pegasus Trail 5,300,9.5,,A road-to-trail daily trainer with springy ReactX foam and an All Terrain Compound outsole for grip on wet and steep ground.
+Nike,Structure,Road,Daily,https://www.nike.com/gb/t/structure-26-mens-road-running-shoes-DyK0ML90,Structure 26,321,10,,"A supportive daily trainer with full-length ReactX foam and a midfoot support system for a guided, stable feel."
+Nike,Vaporfly,Road,Race,https://www.nike.com/t/vaporfly-4-mens-road-racing-shoes-HK05JWOf,Vaporfly 4,,,,"Nike's lightweight racing shoe, pairing ZoomX foam with a carbon-fibre plate for race-day speed."
+Nike,Vomero,Road,Daily,https://www.nike.com/t/vomero-18-mens-road-running-shoes-NzWnvcC8,Vomero 18,325,10,46,"A max-cushioned daily trainer with ZoomX foam stacked on ReactX for a soft, comfortable ride on easy and long runs."
+Nike,Wildhorse,Trail,Daily,https://www.nike.com/gb/t/wildhorse-10-mens-trail-running-shoes-6RHZHLQc,Wildhorse 10,311,9.5,,"A trail shoe for light to moderately technical terrain, with ReactX foam, Trail ATC grip, a rock shield and toe protection."
+Nike,Zegama,Trail,Trail,https://www.nike.com/ie/t/zegama-trail-2-trail-running-shoes-VP1Pxw,Zegama Trail 2,320,4,,"A trail shoe for long runs on technical terrain, with a lightweight ZoomX midsole, Vibram Megagrip and an ankle gaiter."
+Nike,Zoom Fly,Road,Tempo,https://www.nike.com/t/zoom-fly-6-mens-road-racing-shoes-wn2ALjkm/IQ9405-411,Zoom Fly 6,265,8,,A fast training and racing shoe that pairs ZoomX foam with a full-length carbon-fibre plate for an energised ride.
+On,Cloudboom,Road,Race,https://www.on.com/en-us/products/cloudboom-strike-ls-u-3ue3001,LightSpray Cloudboom Strike,,,,"On's ultralight marathon racing shoe, with a seamless LightSpray upper, Helion HF foam and a carbon Speedboard."
+On,Cloudmonster,Road,Daily,https://www.on.com/en-us/products/cloudmonster-2-m-3me1012/mens/black-glacier-shoes-3ME10120777,Cloudmonster 2,300,6,,"A max-cushioned road shoe with On's biggest CloudTec cushioning, dual-density Helion superfoam and a Speedboard for powerful take-offs."
+On,Cloudrunner,Road,Daily,https://www.on.com/en-us/products/cloudrunner-2-m-3me1014/mens/eclipse-black-shoes-3ME10140264,Cloudrunner 2,,,,"A supportive, lightweight everyday shoe with Helion foam for comfortable cushioning and a stable ride."
+On,Cloudsurfer,Road,Daily,https://www.on.com/en-us/products/cloudsurfer-next-3me3002,Cloudsurfer Next,,,,A durable everyday road shoe with CloudTec Phase cushioning and Helion foam for consistent comfort on steady and recovery runs.
+On,Cloudultra,Trail,Trail,https://www.on.com/en-us/products/cloudultra-3-m-3mf3023,Cloudultra 3,,,,"An ultra-distance trail shoe with CloudTec cushioning, Helion HF foam and Missiongrip rubber for technical terrain."
+On,Cloudvista,Both,Daily,https://www.on.com/en-us/products/cloudvista-2-3me3011/mens,Cloudvista 2,,,,A versatile all-round trail shoe with extra CloudTec cushioning and Missiongrip rubber for road-to-trail adventures.
+PUMA,Velocity Nitro,Road,Daily,https://us.puma.com/us/en/pd/velocity-nitro-4-mens-road-running-shoes/311140,Velocity NITRO 4,,10,36,PUMA's lightest Velocity yet: a neutral daily trainer with full-length NITROFOAM and PUMAGRIP rubber for reliable traction.
+Reebok,FloatZig,Road,Daily,https://www.reebok.com/products/reebok-mens-floatzig-1-shoes-chalk-sand-golden-haze-117470,FloatZig 1,278,6,31,"A lightweight, springy everyday trainer with Floatride Energy Foam and a zig-shaped midsole, for new and seasoned runners alike."
+Salomon,Genesis,Trail,Trail,https://www.salomon.com/en-us/product/genesis-2-li9180,Genesis 2,,8,,"A trail shoe for technical terrain, with a wide midsole platform and reworked lugs for traction on rocky ground."
+Salomon,Sense Ride,Trail,Daily,https://www.salomon.com/en-ca/product/sense-ride-5-li3121,Sense Ride 5,293,8,,"A versatile trail shoe for mixed terrain, from short fast runs to ultras, with optiFOAM cushioning and All Terrain Contagrip."
+Salomon,Speedcross,Trail,Daily,https://www.salomon.com/en-us/product/speedcross-6-lg9212,Speedcross 6,312,10,,"Salomon's aggressive trail shoe, with deep 5mm lugs for grip and fast mud release on soft, muddy ground."
+Saucony,Endorphin Pro,Road,Race,https://www.saucony.com/UK/en_GB/endorphin-pro-4/58850M.html,Endorphin Pro 4,212,8,,"Saucony's carbon-plated race shoe, combining two PWRRUN foams with SPEEDROLL technology for a fast, forward-rolling ride."
+Saucony,Endorphin Speed,Road,Tempo,https://www.saucony.com/en/endorphin-speed-5/60307M.html,Endorphin Speed 5,237,,,A lightweight speed trainer with a nylon plate between layers of PWRRUN PB foam for snappy tempo and interval days.
+Saucony,Guide,Road,Daily,https://www.saucony.com/UK/en_GB/guide-18/59947M.html,Guide 18,272,6,,"A daily stability trainer with PWRRUN cushioning and CenterPath, a wide platform with higher sidewalls to keep you secure."
+Saucony,Peregrine,Trail,Daily,,(no men's page found),,,,"A trail shoe with a grippy PWRTRAC outsole, durable mesh upper and PWRRUN cushioning for confidence on wet and dry trails."
+Saucony,Ride,Road,Daily,https://www.saucony.com/UK/en_GB/ride-18/59943M.html,Ride 18,259,8,,"A do-it-all neutral daily trainer with a lighter PWRRUN+ midsole for a plush, responsive ride."
+Saucony,Triumph,Road,Daily,https://www.saucony.com/UK/en_GB/triumph-23/60311M.html,Triumph 23,263,10,,"A cushioned neutral trainer for longer runs, with a soft PWRRUN PB midsole and a breathable engineered mesh upper."
+Under Armour,Infinite,Road,Daily,https://www.underarmour.co.uk/en-gb/p/running/ua_infinite_elite_2_mens_running_shoes/3028169.html,UA Infinite Elite 2,290,8,36,"A neutral long-distance road shoe with HOVR+ foam that is lighter, softer and more responsive than before."
+Under Armour,Velociti,Road,Daily,https://www.underarmour.com/en-us/p/ua_velociti_pace_mens_running_shoes/6009107.html,UA Velociti Pace,249,8,,"An everyday trainer for easy to moderate miles, with UA HOVR foam, a light mono mesh upper and a full-length rubber outsole."

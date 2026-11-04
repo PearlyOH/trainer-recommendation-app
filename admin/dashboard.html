@@ -225,6 +225,70 @@
     .toast.success { background: var(--green-dark); }
     .toast.error { background: var(--danger); }
 
+    /* Tabs */
+    .tabs { display: flex; gap: 4px; border-bottom: 0.5px solid var(--border); margin-bottom: 24px; overflow-x: auto; }
+    .tab {
+      background: none; border: none; border-bottom: 2px solid transparent;
+      padding: 10px 14px; font-size: 13px; font-weight: 500; color: var(--text-2); white-space: nowrap;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--text); border-bottom-color: var(--green-dark); }
+    .tab .count { font-size: 11px; background: var(--bg-soft); border-radius: 999px; padding: 1px 7px; margin-left: 4px; }
+
+    /* Readiness */
+    .ready-line { font-size: 11px; color: var(--text-3); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ready-line.ok { color: var(--green-dark); }
+    .ready-line.warn { color: var(--danger); }
+    .checklist {
+      background: var(--bg-soft); border-radius: var(--radius-md); padding: 12px 14px;
+      margin-top: 16px; font-size: 12px;
+    }
+    .checklist strong { font-weight: 600; }
+    .checklist.ok { background: var(--green-soft); }
+    .checklist ul { margin: 6px 0 0; padding-left: 18px; color: var(--text-2); }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 4px; font-size: 12px;
+      background: var(--bg-card); border: 0.5px solid var(--border); border-radius: 999px; padding: 2px 4px 2px 10px;
+    }
+    .chip button { border: none; background: none; color: var(--text-3); font-size: 14px; line-height: 1; padding: 0 4px; }
+    .chip button:hover { color: var(--danger); }
+    .alias-row { display: flex; gap: 8px; margin-top: 8px; }
+    .alias-row input { flex: 1; }
+
+    /* Panels used by Import / Coverage / Awin */
+    .panel {
+      background: var(--bg-card); border: 0.5px solid var(--border); border-radius: var(--radius-lg);
+      padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow);
+    }
+    .panel h2 { font-size: 15px; font-weight: 600; margin: 0 0 4px; }
+    .panel p { margin: 0 0 12px; color: var(--text-2); font-size: 13px; }
+    .panel textarea { width: 100%; min-height: 140px; font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
+    .row-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+    .check { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-2); }
+    .muted { color: var(--text-3); font-size: 12px; }
+    table.t.wrap td { white-space: normal; vertical-align: top; }
+    .msg-err { color: var(--danger); font-size: 12px; }
+    .msg-warn { color: #8A5A00; font-size: 12px; }
+    .msg-info { color: var(--text-2); font-size: 12px; }
+    .pill-create, .pill-confirmed { background: var(--green-soft); color: #1A6B0A; }
+    .pill-update, .pill-check { background: #FFF4D6; color: #7A5300; }
+    .pill-unchanged, .pill-skip, .pill-rejected { background: var(--bg-soft); color: var(--text-2); }
+    .pill-error, .pill-missing { background: #F4E3E3; color: #7B1E1E; }
+    .pill-live { background: var(--green-soft); color: #1A6B0A; }
+    .pill-not_live { background: #EAF2FB; color: #1E4A7B; }
+    .btn-sm { height: 28px; padding: 0 10px; font-size: 12px; }
+    .btn:disabled { opacity: 0.5; cursor: default; }
+    .link-select { height: 28px; font-size: 12px; max-width: 200px; }
+
+    @media (max-width: 720px) {
+      .topbar { padding: 12px 16px; }
+      .container { padding: 0 16px; margin: 20px auto; }
+      .grid2 { grid-template-columns: 1fr; }
+      .table-wrap { overflow-x: auto; }
+      table.t { min-width: 760px; }
+    }
+
     .hidden { display: none !important; }
   </style>
 </head>
@@ -252,12 +316,21 @@
   </div>
 
   <div class="container">
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-tab="catalogue">Catalogue</button>
+      <button class="tab" data-tab="import">Bulk import</button>
+      <button class="tab" data-tab="coverage">Review coverage <span class="count hidden" id="coverage-count"></span></button>
+      <button class="tab" data-tab="awin">Awin feed</button>
+    </div>
+
+    <section id="tab-catalogue">
     <div class="header">
       <div>
         <h1 class="title">Trainer catalogue</h1>
         <p class="sub">Source of truth for the leaderboard and quiz recommendations.</p>
       </div>
       <div>
+        <button class="btn hidden" id="publish-ready-btn" title="Make every complete draft Live">Publish ready</button>
         <button class="btn" id="refresh-btn" title="Refresh prices from Awin (when connected)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></svg>
           Refresh prices
@@ -284,6 +357,12 @@
         <option value="draft">Draft</option>
         <option value="archived">Archived</option>
       </select>
+      <select id="f-ready">
+        <option value="">All readiness</option>
+        <option value="ready">Ready to publish</option>
+        <option value="missing">Missing info</option>
+        <option value="live-incomplete">Live but incomplete</option>
+      </select>
     </div>
 
     <div class="table-wrap">
@@ -304,6 +383,103 @@
       </table>
       <div class="foot" id="row-count">Loading…</div>
     </div>
+    </section>
+
+    <!-- Bulk import -->
+    <section id="tab-import" class="hidden">
+      <div class="header">
+        <div>
+          <h1 class="title">Bulk import</h1>
+          <p class="sub">Paste rows from Google Sheets or upload a CSV. Nothing is saved until you confirm, and imported trainers always start as drafts.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>1. Add your rows</h2>
+        <p>Use a header row with any of: <code>brand, model, display name, terrain, run type, drop, stack, weight, foot width, image, blurb, source url, aliases</code>.
+          A single column of <code>Brand - Model</code> (like your Tally list) also works. Spreadsheet values like "Daily trainer" or "Road-to-trail" are converted automatically.</p>
+        <textarea id="imp-text" placeholder="brand	model	terrain	run type	source url&#10;Nike	Pegasus	Road	Daily trainer	https://…"></textarea>
+        <div class="row-actions">
+          <input type="file" id="imp-file" accept=".csv,.tsv,.txt" />
+          <button class="btn btn-sm" id="imp-seed">Load Tally trainer list (57)</button>
+          <span class="muted" id="imp-parsed"></span>
+        </div>
+        <div class="row-actions">
+          <label class="check"><input type="checkbox" id="imp-autofill" /> Auto-fill image, blurb and specs from each row's source URL (slower)</label>
+          <label class="check"><input type="checkbox" id="imp-brands" /> Create brands that don't exist yet</label>
+        </div>
+        <div class="row-actions">
+          <button class="btn btn-primary" id="imp-check">Check rows</button>
+          <button class="btn btn-green hidden" id="imp-commit">Import</button>
+          <span class="muted" id="imp-status"></span>
+        </div>
+      </div>
+      <div class="table-wrap hidden" id="imp-results-wrap">
+        <table class="t wrap">
+          <colgroup><col style="width: 7%"><col style="width: 27%"><col style="width: 12%"><col style="width: 54%"></colgroup>
+          <thead><tr><th>Row</th><th>Trainer</th><th>Result</th><th>Details</th></tr></thead>
+          <tbody id="imp-results"></tbody>
+        </table>
+        <div class="foot" id="imp-summary"></div>
+      </div>
+    </section>
+
+    <!-- Coverage -->
+    <section id="tab-coverage" class="hidden">
+      <div class="header">
+        <div>
+          <h1 class="title">Review coverage</h1>
+          <p class="sub">Every trainer named in your Tally reviews, and whether it has a Live trainer card.</p>
+        </div>
+        <div>
+          <button class="btn hidden" id="cov-to-import">Send missing to import</button>
+          <button class="btn" id="cov-reload">Reload reviews</button>
+        </div>
+      </div>
+      <div class="metrics" id="cov-metrics"></div>
+      <div class="table-wrap">
+        <table class="t wrap">
+          <colgroup><col style="width: 28%"><col style="width: 9%"><col style="width: 9%"><col style="width: 12%"><col style="width: 42%"></colgroup>
+          <thead><tr><th>Reviewed as</th><th>Reviews</th><th>Avg score</th><th>Status</th><th>Catalogue</th></tr></thead>
+          <tbody id="cov-rows"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody>
+        </table>
+        <div class="foot" id="cov-foot"></div>
+      </div>
+    </section>
+
+    <!-- Awin -->
+    <section id="tab-awin" class="hidden">
+      <div class="header">
+        <div>
+          <h1 class="title">Awin feed</h1>
+          <p class="sub">Match retailer products to your trainers so prices and affiliate links can fill in automatically.</p>
+        </div>
+      </div>
+      <div class="metrics" id="awin-metrics"></div>
+      <div class="panel">
+        <h2>Match a product feed</h2>
+        <p>Download a CSV feed from Awin (Toolbox → Create-a-Feed) and choose it here. It's read in your browser and only the product rows are sent for matching.
+          Your Awin link or API key is never needed here. Confirmed matches are remembered, so later feed refreshes can fill in prices automatically.</p>
+        <div class="row-actions">
+          <input type="file" id="awin-file" accept=".csv,.txt" />
+          <span class="muted" id="awin-status"></span>
+        </div>
+        <div class="row-actions hidden" id="awin-bulk">
+          <button class="btn btn-green btn-sm" id="awin-confirm-all">Confirm all name matches</button>
+          <select id="awin-filter" class="link-select">
+            <option value="todo">Needs a decision</option>
+            <option value="all">All matches</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-wrap hidden" id="awin-results-wrap">
+        <table class="t wrap">
+          <colgroup><col style="width: 34%"><col style="width: 16%"><col style="width: 9%"><col style="width: 21%"><col style="width: 20%"></colgroup>
+          <thead><tr><th>Feed product</th><th>Retailer</th><th>Price</th><th>Matched trainer</th><th></th></tr></thead>
+          <tbody id="awin-rows"></tbody>
+        </table>
+        <div class="foot" id="awin-foot"></div>
+      </div>
+    </section>
   </div>
 </div>
 
@@ -360,6 +536,18 @@
       </div>
     </div>
 
+    <div class="checklist" id="live-checklist"></div>
+
+    <div class="checklist hidden" id="alias-block">
+      <strong>Also known as</strong>
+      <span class="muted">— other names reviewers or retailers use, so they match this trainer</span>
+      <div class="chips" id="alias-chips"></div>
+      <div class="alias-row">
+        <input type="text" id="alias-input" placeholder="e.g. Nike Air Zoom Pegasus" />
+        <button class="btn btn-sm" id="alias-add">Add</button>
+      </div>
+    </div>
+
     <div class="actions">
       <button class="btn btn-danger left hidden" id="delete-btn">Delete trainer</button>
       <button class="btn" id="cancel-btn">Cancel</button>
@@ -389,10 +577,20 @@
     }
     if (!res.ok) {
       const text = await res.text();
-      throw new Error(text || res.statusText);
+      const err = new Error(text || res.statusText);
+      try { err.detail = JSON.parse(text).detail; } catch (_) {}
+      throw err;
     }
     if (res.status === 204) return null;
     return res.json();
+  }
+
+  function errMsg(e) {
+    const d = e && e.detail;
+    if (d && typeof d === 'object' && d.missing) return `${d.message}: ${d.missing.join(', ')}`;
+    if (typeof d === 'string') return d;
+    if (Array.isArray(d)) return d.map(x => x.msg).join('; ');
+    return (e && e.message || 'Unknown error').slice(0, 160);
   }
 
   // ============================================================
@@ -431,7 +629,9 @@
   let trainers = [];
   let brands = [];
   let editingId = null;
-  let filters = { q: '', brand: '', terrain: '', status: '' };
+  let filters = { q: '', brand: '', terrain: '', status: '', ready: '' };
+  // From /trainers/_readiness: { required: [...], trainers: { id: { missing, live, aliases, ... } } }
+  let readiness = { required: [], affiliate_required: false, trainers: {} };
 
   const $ = id => document.getElementById(id);
 
@@ -454,13 +654,18 @@
     const filterSel = $('f-brand');
     const inputSel = $('f-brand-in');
     filterSel.innerHTML = '<option value="">All brands</option>' +
-      brands.map(b => `<option value="${b.name}">${b.name}</option>`).join('');
-    inputSel.innerHTML = brands.map(b => `<option value="${b.name}">${b.name}</option>`).join('');
+      brands.map(b => `<option value="${esc(b.name)}">${esc(b.name)}</option>`).join('');
+    inputSel.innerHTML = brands.map(b => `<option value="${esc(b.name)}">${esc(b.name)}</option>`).join('');
   }
 
   async function loadTrainers() {
     try {
-      trainers = await api('/trainers?include_drafts=true');
+      const [list, ready] = await Promise.all([
+        api('/trainers?include_drafts=true'),
+        api('/trainers/_readiness').catch(e => { console.error(e); return null; }),
+      ]);
+      trainers = list;
+      if (ready) readiness = ready;
       render();
     } catch (e) {
       toast('Failed to load trainers', 'error');
@@ -478,13 +683,42 @@
     const drafts = trainers.filter(t => t.status === 'draft').length;
     const prices = trainers.map(t => t.best_price).filter(p => p != null);
     const avgPrice = prices.length ? Math.round(prices.reduce((s,p) => s+p, 0) / prices.length) : 0;
+    const ready = readyToPublish().length;
+    const liveIncomplete = trainers.filter(t => readyState(t) === 'live-incomplete').length;
     $('metrics').innerHTML = `
       <div class="metric accent"><div class="metric-label">Live on frontend</div><div class="metric-value">${visible}</div></div>
       <div class="metric"><div class="metric-label">Total trainers</div><div class="metric-value">${total}</div></div>
       <div class="metric"><div class="metric-label">Active</div><div class="metric-value">${active}</div></div>
       <div class="metric"><div class="metric-label">Drafts</div><div class="metric-value">${drafts}</div></div>
+      <div class="metric"><div class="metric-label">Ready to publish</div><div class="metric-value">${ready}</div></div>
+      ${liveIncomplete ? `<div class="metric"><div class="metric-label">Live but incomplete</div><div class="metric-value" style="color:var(--danger)">${liveIncomplete}</div></div>` : ''}
       <div class="metric"><div class="metric-label">Avg price</div><div class="metric-value">${avgPrice ? '£'+avgPrice : '—'}</div></div>
     `;
+    $('publish-ready-btn').classList.toggle('hidden', !ready);
+    $('publish-ready-btn').textContent = `Publish ready (${ready})`;
+  }
+
+  // ready | missing | live | live-incomplete | unknown (readiness not loaded)
+  function readyState(t) {
+    const r = readiness.trainers[t.id];
+    if (!r) return 'unknown';
+    const live = t.status === 'active' && t.visible_on_frontend;
+    if (live) return r.missing.length ? 'live-incomplete' : 'live';
+    return r.missing.length ? 'missing' : 'ready';
+  }
+
+  function readyToPublish() {
+    return trainers.filter(t => readyState(t) === 'ready' && t.status !== 'archived');
+  }
+
+  function readyLine(t) {
+    const r = readiness.trainers[t.id];
+    if (!r) return '';
+    const st = readyState(t);
+    if (st === 'live') return '<div class="ready-line ok">✓ Live, card complete</div>';
+    if (st === 'ready') return '<div class="ready-line ok">✓ Ready to publish</div>';
+    const cls = st === 'live-incomplete' ? 'warn' : '';
+    return `<div class="ready-line ${cls}" title="${esc(r.missing.join(', '))}">Missing ${r.missing.length}: ${esc(r.missing.join(', '))}</div>`;
   }
 
   function esc(s) {
@@ -497,6 +731,7 @@
       if (filters.brand && t.brand !== filters.brand) return false;
       if (filters.terrain && t.terrain !== filters.terrain) return false;
       if (filters.status && t.status !== filters.status) return false;
+      if (filters.ready && readyState(t) !== filters.ready) return false;
       if (q) {
         const hay = `${t.display_name} ${t.brand} ${t.model}`.toLowerCase();
         if (!hay.includes(q)) return false;
@@ -527,6 +762,7 @@
                 <div class="name-text">
                   <div class="name-model">${esc(t.display_name)}</div>
                   <div class="name-brand">${esc(t.brand)} · ${esc(t.model)}</div>
+                  ${readyLine(t)}
                 </div>
               </div>
             </td>
@@ -574,12 +810,93 @@
     $('f-drop').value = t?.drop_mm ?? '';
     $('f-stack').value = t?.stack_mm ?? '';
     $('f-weight').value = t?.weight_g ?? '';
-    $('f-width').value = t?.foot_width || 'Regular';
+    // New trainers default to Regular; existing ones show a gap as a gap
+    $('f-width').value = t ? (t.foot_width || '') : 'Regular';
     $('f-image').value = t?.hero_image_url || '';
     $('f-blurb').value = t?.blurb || '';
     $('f-status-in').value = t?.status || 'draft';
     $('f-visible').value = String(t?.visible_on_frontend === true);
+    renderAliases();
+    updateChecklist();
     $('modal-bg').classList.add('open');
+  }
+
+  // Mirrors REQUIRED_FOR_LIVE in services/trainer_rules.py. The server is the
+  // final check; this just shows what's missing while you type.
+  const LIVE_FIELDS = [
+    ['f-name', 'Display name'], ['f-terrain-in', 'Terrain'], ['f-runtype', 'Run type'],
+    ['f-width', 'Foot width'], ['f-image', 'Hero image'], ['f-blurb', 'Blurb'],
+    ['f-drop', 'Drop (mm)'], ['f-stack', 'Stack (mm)'], ['f-weight', 'Weight (g)'],
+  ];
+
+  function modalMissing() {
+    const missing = LIVE_FIELDS.filter(([id]) => !$(id).value.trim()).map(([, label]) => label);
+    const img = $('f-image').value.trim();
+    if (img && !img.startsWith('https://')) missing.push('Hero image (must be https)');
+    const blurb = $('f-blurb').value.trim();
+    if (blurb && (blurb.length < 30 || blurb.length > 500)) missing.push(`Blurb (30–500 characters, now ${blurb.length})`);
+    if (readiness.affiliate_required) {
+      const r = editingId && readiness.trainers[editingId];
+      if (!(r && r.has_affiliate_link)) missing.push('Affiliate link');
+    }
+    return missing;
+  }
+
+  function updateChecklist() {
+    const missing = modalMissing();
+    const box = $('live-checklist');
+    box.className = 'checklist' + (missing.length ? '' : ' ok');
+    box.innerHTML = missing.length
+      ? `<strong>Not ready for Live yet</strong> — saving as Active + Visible will be refused until these are filled in:<ul>${missing.map(m => `<li>${esc(m)}</li>`).join('')}</ul>`
+      : '<strong>✓ Card complete</strong> — set Status to Active and Visible to Yes to put it Live.';
+  }
+
+  function renderAliases() {
+    const block = $('alias-block');
+    block.classList.toggle('hidden', !editingId);
+    if (!editingId) return;
+    const list = readiness.trainers[editingId]?.aliases || [];
+    $('alias-chips').innerHTML = list.length
+      ? list.map(a => `<span class="chip">${esc(a.alias)}<button data-alias="${a.id}" title="Remove">×</button></span>`).join('')
+      : '<span class="muted">None yet. Coverage links add these automatically.</span>';
+    $('alias-chips').querySelectorAll('[data-alias]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        await api(`/trainers/_aliases/${b.dataset.alias}`, { method: 'DELETE' });
+        await refreshReadiness();
+        renderAliases();
+      } catch (e) { toast('Could not remove: ' + errMsg(e), 'error'); }
+    }));
+  }
+
+  async function addAlias() {
+    const alias = $('alias-input').value.trim();
+    if (!alias || !editingId) return;
+    try {
+      await api(`/trainers/${editingId}/aliases`, { method: 'POST', body: JSON.stringify({ alias }) });
+      $('alias-input').value = '';
+      await refreshReadiness();
+      renderAliases();
+    } catch (e) { toast('Could not add alias: ' + errMsg(e), 'error'); }
+  }
+
+  async function refreshReadiness() {
+    try { readiness = await api('/trainers/_readiness'); } catch (e) { console.error(e); }
+  }
+
+  async function publishReady() {
+    const list = readyToPublish();
+    if (!list.length) return;
+    if (!confirm(`Put ${list.length} complete trainer(s) Live?\n\n${list.map(t => t.display_name).join('\n')}`)) return;
+    let ok = 0, failed = [];
+    for (const t of list) {
+      try {
+        await api(`/trainers/${t.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'active', visible_on_frontend: true }) });
+        ok++;
+      } catch (e) { failed.push(`${t.display_name}: ${errMsg(e)}`); }
+    }
+    toast(`${ok} trainer(s) now Live` + (failed.length ? `, ${failed.length} failed` : ''), failed.length ? 'error' : 'success');
+    if (failed.length) console.warn(failed);
+    await loadTrainers();
   }
 
   function closeModal() { $('modal-bg').classList.remove('open'); editingId = null; }
@@ -613,7 +930,7 @@
       closeModal();
       await loadTrainers();
     } catch (e) {
-      toast('Save failed: ' + e.message.slice(0, 80), 'error');
+      toast('Save failed — ' + errMsg(e), 'error', 6000);
     }
   }
 
@@ -626,7 +943,7 @@
       closeModal();
       await loadTrainers();
     } catch (e) {
-      toast('Delete failed: ' + e.message.slice(0, 80), 'error');
+      toast('Delete failed — ' + errMsg(e), 'error', 6000);
     }
   }
 
@@ -661,6 +978,7 @@
         ? `Found: ${found.join(', ')}. Check & adjust before saving.`
         : 'Nothing usable found on that page. Fill manually.';
       statusEl.className = 'fetch-status ' + (found.length ? 'ok' : 'err');
+      updateChecklist();
     } catch (e) {
       statusEl.textContent = 'Fetch failed — that site likely blocks bots. Fill manually.';
       statusEl.className = 'fetch-status err';
@@ -688,15 +1006,385 @@
   }
 
   // ============================================================
+  // Tabs
+  // ============================================================
+  const loadedTabs = {};
+  function showTab(name) {
+    document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+    ['catalogue', 'import', 'coverage', 'awin'].forEach(n => $('tab-' + n).classList.toggle('hidden', n !== name));
+    if (name === 'coverage' && !loadedTabs.coverage) { loadedTabs.coverage = true; loadCoverage(); }
+    if (name === 'awin') renderAwinMetrics();
+  }
+
+  // ============================================================
+  // CSV / pasted-sheet parsing (runs in the browser)
+  // ============================================================
+  function parseDelimited(text) {
+    const firstLine = text.split(/\r?\n/, 1)[0] || '';
+    const delim = firstLine.includes('\t') ? '\t' : ',';
+    const rows = []; let row = [], field = '', quoted = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (quoted) {
+        if (c === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else quoted = false; }
+        else field += c;
+      } else if (c === '"' && field === '') quoted = true;
+      else if (c === delim) { row.push(field); field = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && text[i + 1] === '\n') i++;
+        row.push(field); rows.push(row); row = []; field = '';
+      } else field += c;
+    }
+    if (field !== '' || row.length) { row.push(field); rows.push(row); }
+    return rows.filter(r => r.some(v => v.trim() !== ''));
+  }
+
+  const normHeader = h => h.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+
+  // Header names we recognise -> import field (spreadsheet + Trainer List tab names)
+  const IMPORT_COLUMNS = {
+    brand: ['brand', 'brand name'],
+    model: ['model', 'family', 'trainer', 'model name'],
+    display_name: ['display name', 'displayname'],
+    terrain: ['terrain', 'surface', 'primarysurface', 'primary surface'],
+    run_type: ['run type', 'runtype', 'purpose', 'primarypurpose', 'primary purpose'],
+    drop_mm: ['drop', 'drop mm', 'heel drop'],
+    stack_mm: ['stack', 'stack mm', 'stack height'],
+    weight_g: ['weight', 'weight g'],
+    foot_width: ['foot width', 'width', 'widthoptions'],
+    hero_image_url: ['image', 'hero image', 'image url', 'hero image url'],
+    blurb: ['blurb', 'description'],
+    source_url: ['source', 'source url', 'url', 'product url', 'producturl'],
+    aliases: ['aliases', 'alias', 'other names'],
+  };
+
+  function rowsToImport(table) {
+    if (!table.length) return { rows: [], columns: [] };
+    const header = table[0].map(normHeader);
+    const colFor = {};
+    header.forEach((h, i) => {
+      for (const [field, names] of Object.entries(IMPORT_COLUMNS)) {
+        if (names.includes(h) && colFor[field] === undefined) colFor[field] = i;
+      }
+    });
+    let body = table.slice(1);
+    if (colFor.brand === undefined) {
+      // No header: "Brand - Model" in one column, or brand + model in two
+      body = table;
+      Object.keys(colFor).forEach(k => delete colFor[k]);
+      colFor.brand = 0;
+      if (table[0].length > 1 && table[0][1].trim()) colFor.model = 1;
+    }
+    const rows = body.map(r => {
+      const out = {};
+      for (const [field, i] of Object.entries(colFor)) {
+        const v = (r[i] || '').trim();
+        if (v) out[field] = v;
+      }
+      return out;
+    }).filter(r => Object.keys(r).length);
+    return { rows, columns: Object.keys(colFor), headerRows: body === table ? 0 : 1 };
+  }
+
+  // ============================================================
+  // Bulk import
+  // ============================================================
+  let importRows = [], importHeaderRows = 0;
+
+  function parseImport() {
+    const { rows, columns, headerRows } = rowsToImport(parseDelimited($('imp-text').value));
+    importRows = rows; importHeaderRows = headerRows || 0;
+    $('imp-parsed').textContent = rows.length
+      ? `${rows.length} row(s) · columns: ${columns.join(', ')}` : '';
+    $('imp-commit').classList.add('hidden');
+    return rows;
+  }
+
+  async function runImport(dryRun) {
+    const rows = parseImport();
+    if (!rows.length) { toast('Paste or upload some rows first', 'error'); return; }
+    const autofill = $('imp-autofill').checked;
+    const chunk = autofill ? 10 : 100;
+    const btn = dryRun ? $('imp-check') : $('imp-commit');
+    btn.disabled = true;
+    const all = [];
+    try {
+      for (let i = 0; i < rows.length; i += chunk) {
+        $('imp-status').textContent = `${dryRun ? 'Checking' : 'Importing'} rows ${i + 1}–${Math.min(i + chunk, rows.length)} of ${rows.length}…`;
+        const res = await api('/trainers/_import', {
+          method: 'POST',
+          body: JSON.stringify({
+            rows: rows.slice(i, i + chunk), dry_run: dryRun, autofill,
+            create_missing_brands: $('imp-brands').checked,
+            first_row_number: i + 1 + importHeaderRows,
+          }),
+        });
+        all.push(...res.rows);
+      }
+      renderImportResults(all, dryRun);
+      if (!dryRun) { await loadBrands(); await loadTrainers(); loadedTabs.coverage = false; }
+    } catch (e) {
+      toast('Import failed — ' + errMsg(e), 'error', 6000);
+    } finally {
+      btn.disabled = false;
+      $('imp-status').textContent = '';
+    }
+  }
+
+  const ACTION_LABEL = { create: 'New', update: 'Fill blanks', unchanged: 'No change', skip: 'Skipped', error: 'Error' };
+
+  function renderImportResults(rows, dryRun) {
+    const counts = {};
+    rows.forEach(r => counts[r.action] = (counts[r.action] || 0) + 1);
+    const failed = rows.filter(r => r.saved === false).length;
+    $('imp-results').innerHTML = rows.map(r => {
+      const details = [
+        ...r.errors.map(m => `<div class="msg-err">${esc(m)}</div>`),
+        ...r.warnings.map(m => `<div class="msg-warn">${esc(m)}</div>`),
+      ];
+      const fill = Object.keys(r.fill || {});
+      if (fill.length) details.push(`<div class="msg-info">${r.action === 'create' ? 'Sets' : 'Fills'}: ${esc(fill.join(', '))}</div>`);
+      if (r.autofilled && r.autofilled.length) details.push(`<div class="msg-info">From source URL: ${esc(r.autofilled.join(', '))}</div>`);
+      if (r.aliases && r.aliases.length) details.push(`<div class="msg-info">Aliases: ${esc(r.aliases.join('; '))}</div>`);
+      if (!dryRun && r.saved) details.push('<div class="msg-info">✓ Saved</div>');
+      return `<tr>
+        <td>${r.row}</td>
+        <td>${esc([r.brand, r.model].filter(Boolean).join(' · ') || '—')}</td>
+        <td><span class="pill pill-${r.action}">${ACTION_LABEL[r.action] || r.action}</span></td>
+        <td>${details.join('') || '<span class="muted">—</span>'}</td>
+      </tr>`;
+    }).join('');
+    $('imp-results-wrap').classList.remove('hidden');
+    const parts = Object.entries(counts).map(([k, n]) => `${n} ${(ACTION_LABEL[k] || k).toLowerCase()}`);
+    $('imp-summary').textContent = (dryRun ? 'Check: ' : 'Imported: ') + parts.join(' · ') + (failed ? ` · ${failed} rejected by the database` : '');
+    const toSave = (counts.create || 0) + (counts.update || 0);
+    $('imp-commit').classList.toggle('hidden', !dryRun || !toSave);
+    $('imp-commit').textContent = `Import ${toSave} trainer(s) as drafts`;
+    if (!dryRun) toast(`Import finished: ${parts.join(', ')}`, failed ? 'error' : 'success', 5000);
+  }
+
+  async function loadFile(input, target) {
+    const file = input.files[0];
+    if (!file) return;
+    $(target).value = await file.text();
+    parseImport();
+  }
+
+  async function loadSeed() {
+    try {
+      const res = await fetch('/admin/seed/tally_trainer_list.csv');
+      if (!res.ok) throw new Error(res.statusText);
+      $('imp-text').value = await res.text();
+      $('imp-autofill').checked = true;  // the list carries a source URL per trainer
+      parseImport();
+    } catch (e) { toast('Could not load the Tally list', 'error'); }
+  }
+
+  // ============================================================
+  // Review coverage
+  // ============================================================
+  let coverage = null;
+  const STATE_LABEL = { missing: 'Not in catalogue', check: 'Check match', not_live: 'In catalogue, not Live', live: 'Live' };
+
+  async function loadCoverage() {
+    $('cov-rows').innerHTML = '<tr><td colspan="5" class="empty">Reading reviews from Google Sheets…</td></tr>';
+    try {
+      coverage = await api('/trainers/_coverage');
+      renderCoverage();
+    } catch (e) {
+      $('cov-rows').innerHTML = `<tr><td colspan="5" class="empty"><strong>Couldn't read reviews</strong>${esc(errMsg(e))}</td></tr>`;
+    }
+  }
+
+  function trainerOptions(selectedId) {
+    return '<option value="">Link to…</option>' + [...trainers]
+      .sort((a, b) => a.display_name.localeCompare(b.display_name))
+      .map(t => `<option value="${t.id}" ${t.id === selectedId ? 'selected' : ''}>${esc(t.display_name)}</option>`).join('');
+  }
+
+  function renderCoverage() {
+    const s = coverage.summary;
+    const missing = coverage.rows.filter(r => r.state === 'missing');
+    $('cov-metrics').innerHTML = `
+      <div class="metric"><div class="metric-label">Reviews</div><div class="metric-value">${coverage.total_reviews}</div></div>
+      <div class="metric accent"><div class="metric-label">Reviews with a Live card</div><div class="metric-value">${s.live || 0}</div></div>
+      <div class="metric"><div class="metric-label">In catalogue, not Live</div><div class="metric-value">${s.not_live || 0}</div></div>
+      <div class="metric"><div class="metric-label">Need a check</div><div class="metric-value">${s.check || 0}</div></div>
+      <div class="metric"><div class="metric-label">Not in catalogue</div><div class="metric-value">${s.missing || 0}</div></div>`;
+    const todo = coverage.rows.filter(r => r.state === 'missing' || r.state === 'check').length;
+    $('coverage-count').textContent = todo;
+    $('coverage-count').classList.toggle('hidden', !todo);
+    $('cov-to-import').classList.toggle('hidden', !missing.some(r => r.suggested));
+
+    $('cov-rows').innerHTML = coverage.rows.map((r, i) => {
+      let cat = '';
+      const m = r.match;
+      if (m) {
+        const how = { exact: '', alias: ' (via alias)', name: ' (name match)', similar: ' (similar spelling)' }[m.via] || '';
+        cat = `<div><strong>${esc(m.display_name)}</strong><span class="muted">${how}</span></div>`;
+        if (m.missing.length && r.state !== 'check') cat += `<div class="ready-line">Missing ${m.missing.length}: ${esc(m.missing.join(', '))}</div>`;
+      }
+      const actions = [];
+      if (r.state === 'check') actions.push(`<button class="btn btn-sm" data-cov-confirm="${i}">Yes, same trainer</button>`);
+      if (r.state === 'missing' && r.suggested) actions.push(`<button class="btn btn-sm btn-green" data-cov-add="${i}">Add as draft</button>`);
+      if (r.state === 'missing' && !r.suggested) actions.push(`<button class="btn btn-sm" data-cov-new="${i}">Add trainer…</button>`);
+      if (r.state === 'missing' || r.state === 'check') actions.push(`<select class="link-select" data-cov-link="${i}">${trainerOptions()}</select>`);
+      if (m && r.state !== 'check') actions.push(`<button class="btn btn-sm" data-cov-open="${m.trainer_id}">Open</button>`);
+      return `<tr>
+        <td>${esc(r.answer)}<div class="muted">${r.kind === 'dropdown' ? 'Tally dropdown' : 'Typed under "Other"'}</div></td>
+        <td>${r.reviews}</td>
+        <td>${r.avg_score ?? '—'}</td>
+        <td><span class="pill pill-${r.state}">${STATE_LABEL[r.state]}</span></td>
+        <td>${cat}<div class="row-actions" style="margin-top:6px">${actions.join('')}</div></td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="5" class="empty">No reviews found.</td></tr>';
+    $('cov-foot').textContent = coverage.unreviewed.length
+      ? `In the catalogue with no reviews yet (${coverage.unreviewed.length}): ${coverage.unreviewed.join(', ')}` : '';
+
+    const rowOf = el => coverage.rows[Number(el.dataset.covConfirm ?? el.dataset.covAdd ?? el.dataset.covNew ?? el.dataset.covLink)];
+    document.querySelectorAll('[data-cov-confirm]').forEach(b => b.addEventListener('click', () => {
+      const r = rowOf(b); linkAlias(r.answer, r.match.trainer_id);
+    }));
+    document.querySelectorAll('[data-cov-link]').forEach(sel => sel.addEventListener('change', () => {
+      if (sel.value) linkAlias(rowOf(sel).answer, sel.value);
+    }));
+    document.querySelectorAll('[data-cov-add]').forEach(b => b.addEventListener('click', () => addFromCoverage([rowOf(b)])));
+    document.querySelectorAll('[data-cov-new]').forEach(b => b.addEventListener('click', () => {
+      showTab('catalogue'); openModal(null); $('f-model').value = rowOf(b).answer; updateChecklist();
+    }));
+    document.querySelectorAll('[data-cov-open]').forEach(b => b.addEventListener('click', () => {
+      showTab('catalogue'); openModal(b.dataset.covOpen);
+    }));
+  }
+
+  async function linkAlias(answer, trainerId) {
+    try {
+      await api(`/trainers/${trainerId}/aliases`, { method: 'POST', body: JSON.stringify({ alias: answer }) });
+      toast(`"${answer}" now counts as this trainer`, 'success');
+      await refreshReadiness();
+      await loadCoverage();
+    } catch (e) { toast('Could not link — ' + errMsg(e), 'error', 6000); }
+  }
+
+  async function addFromCoverage(rows) {
+    const payload = rows.filter(r => r.suggested).map(r => ({ brand: r.suggested.brand, model: r.suggested.model }));
+    if (!payload.length) return;
+    try {
+      const res = await api('/trainers/_import', {
+        method: 'POST',
+        body: JSON.stringify({ rows: payload, dry_run: false, create_missing_brands: true }),
+      });
+      const errors = res.rows.filter(r => r.errors.length);
+      toast(errors.length ? `Not added: ${errors.map(r => r.errors[0]).join('; ')}` : `Added ${payload.length} draft(s)`,
+            errors.length ? 'error' : 'success', 6000);
+      await loadBrands(); await loadTrainers(); await loadCoverage();
+    } catch (e) { toast('Could not add — ' + errMsg(e), 'error', 6000); }
+  }
+
+  function sendMissingToImport() {
+    const rows = coverage.rows.filter(r => r.state === 'missing' && r.suggested);
+    $('imp-text').value = 'brand\tmodel\n' + rows.map(r => `${r.suggested.brand}\t${r.suggested.model}`).join('\n');
+    showTab('import');
+    parseImport();
+  }
+
+  // ============================================================
+  // Awin feed matching
+  // ============================================================
+  let awinProducts = [];
+
+  function renderAwinMetrics() {
+    const ids = Object.keys(readiness.trainers);
+    const matched = ids.filter(id => readiness.trainers[id].feed_matches > 0).length;
+    const linked = ids.filter(id => readiness.trainers[id].has_affiliate_link).length;
+    $('awin-metrics').innerHTML = `
+      <div class="metric"><div class="metric-label">Trainers</div><div class="metric-value">${ids.length}</div></div>
+      <div class="metric accent"><div class="metric-label">With a confirmed feed match</div><div class="metric-value">${matched}</div></div>
+      <div class="metric"><div class="metric-label">With an affiliate link</div><div class="metric-value">${linked}</div></div>
+      <div class="metric"><div class="metric-label">Affiliate link required for Live</div><div class="metric-value" style="font-size:16px;padding-top:6px">${readiness.affiliate_required ? 'Yes' : 'Not yet'}</div></div>`;
+  }
+
+  async function loadAwinFile() {
+    const file = $('awin-file').files[0];
+    if (!file) return;
+    $('awin-status').textContent = 'Reading feed…';
+    const table = parseDelimited(await file.text());
+    const header = table[0].map(h => h.trim().toLowerCase());
+    const need = ['aw_product_id', 'merchant_id', 'product_name'];
+    const missingCols = need.filter(c => !header.includes(c));
+    if (missingCols.length) {
+      $('awin-status').textContent = `This doesn't look like an Awin feed — missing columns: ${missingCols.join(', ')}`;
+      return;
+    }
+    const keep = ['aw_product_id', 'merchant_id', 'merchant_name', 'product_name', 'brand_name', 'search_price',
+                  'currency', 'in_stock', 'aw_deep_link', 'merchant_image_url'];
+    const products = table.slice(1).map(r => {
+      const p = {};
+      keep.forEach(k => { const i = header.indexOf(k); if (i >= 0 && r[i] !== undefined && r[i] !== '') p[k] = r[i]; });
+      return p;
+    }).filter(p => p.aw_product_id && p.merchant_id && p.product_name);
+    awinProducts = [];
+    try {
+      for (let i = 0; i < products.length; i += 1000) {
+        $('awin-status').textContent = `Matching products ${i + 1}–${Math.min(i + 1000, products.length)} of ${products.length}…`;
+        const res = await api('/trainers/_awin/preview', { method: 'POST', body: JSON.stringify({ products: products.slice(i, i + 1000) }) });
+        awinProducts.push(...res.products);
+      }
+      $('awin-status').textContent = `${products.length} products scanned, ${awinProducts.length} look like trainers in your catalogue.`;
+      renderAwin();
+    } catch (e) {
+      $('awin-status').textContent = 'Matching failed — ' + errMsg(e);
+    }
+  }
+
+  function renderAwin() {
+    const filter = $('awin-filter').value;
+    const rows = awinProducts.map((p, i) => [p, i]).filter(([p]) => filter === 'all' || !p.decision);
+    $('awin-bulk').classList.toggle('hidden', !awinProducts.length);
+    $('awin-results-wrap').classList.toggle('hidden', !awinProducts.length);
+    $('awin-rows').innerHTML = rows.map(([p, i]) => `
+      <tr>
+        <td>${esc(p.product_name)}<div class="muted">${esc(p.brand_name || '')} · #${esc(p.aw_product_id)}</div></td>
+        <td>${esc(p.merchant_name || p.merchant_id)}</td>
+        <td class="price">${p.search_price ? '£' + esc(p.search_price) : '—'}</td>
+        <td>${esc(p.display_name)}<div class="muted">${p.confident ? 'name match' : 'similar spelling — check'}</div></td>
+        <td>${p.decision
+          ? `<span class="pill pill-${p.decision}">${p.decision}</span>`
+          : `<button class="btn btn-sm btn-green" data-awin="${i}" data-status="confirmed">Confirm</button>
+             <button class="btn btn-sm" data-awin="${i}" data-status="rejected">Not this</button>`}</td>
+      </tr>`).join('') || '<tr><td colspan="5" class="empty">Nothing left to decide.</td></tr>';
+    $('awin-foot').textContent = `${awinProducts.filter(p => p.decision === 'confirmed').length} confirmed · ${awinProducts.filter(p => !p.decision).length} to decide`;
+    document.querySelectorAll('[data-awin]').forEach(b => b.addEventListener('click', () =>
+      saveAwinDecisions([awinProducts[Number(b.dataset.awin)]], b.dataset.status)));
+  }
+
+  async function saveAwinDecisions(products, status) {
+    if (!products.length) return;
+    try {
+      await api('/trainers/_awin/matches', {
+        method: 'POST',
+        body: JSON.stringify({ matches: products.map(p => ({
+          trainer_id: p.trainer_id, merchant_id: p.merchant_id, merchant_name: p.merchant_name || null,
+          feed_product_id: p.aw_product_id, product_name: p.product_name, status,
+        })) }),
+      });
+      products.forEach(p => p.decision = status);
+      renderAwin();
+      await refreshReadiness();
+      renderAwinMetrics();
+    } catch (e) { toast('Could not save — ' + errMsg(e), 'error', 6000); }
+  }
+
+  // ============================================================
   // Toast
   // ============================================================
   let toastTimer = null;
-  function toast(msg, kind) {
+  function toast(msg, kind, ms) {
     const el = $('toast');
     el.textContent = msg;
     el.className = 'toast show ' + (kind || '');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.className = 'toast ' + (kind || ''), 3000);
+    toastTimer = setTimeout(() => el.className = 'toast ' + (kind || ''), ms || 3000);
   }
 
   // ============================================================
@@ -713,6 +1401,24 @@
   $('f-brand').addEventListener('change', e => { filters.brand = e.target.value; renderRows(); });
   $('f-terrain').addEventListener('change', e => { filters.terrain = e.target.value; renderRows(); });
   $('f-status').addEventListener('change', e => { filters.status = e.target.value; renderRows(); });
+  $('f-ready').addEventListener('change', e => { filters.ready = e.target.value; renderRows(); });
+  $('publish-ready-btn').addEventListener('click', publishReady);
+  document.querySelector('.modal').addEventListener('input', updateChecklist);
+  document.querySelector('.modal').addEventListener('change', updateChecklist);
+  $('alias-add').addEventListener('click', addAlias);
+  $('alias-input').addEventListener('keydown', e => { if (e.key === 'Enter') addAlias(); });
+  document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+  $('imp-text').addEventListener('input', parseImport);
+  $('imp-file').addEventListener('change', () => loadFile($('imp-file'), 'imp-text'));
+  $('imp-seed').addEventListener('click', loadSeed);
+  $('imp-check').addEventListener('click', () => runImport(true));
+  $('imp-commit').addEventListener('click', () => runImport(false));
+  $('cov-reload').addEventListener('click', loadCoverage);
+  $('cov-to-import').addEventListener('click', sendMissingToImport);
+  $('awin-file').addEventListener('change', loadAwinFile);
+  $('awin-filter').addEventListener('change', renderAwin);
+  $('awin-confirm-all').addEventListener('click', () =>
+    saveAwinDecisions(awinProducts.filter(p => !p.decision && p.confident), 'confirmed'));
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 })();
 </script>

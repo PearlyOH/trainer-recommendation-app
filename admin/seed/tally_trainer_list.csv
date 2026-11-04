@@ -1,0 +1,58 @@
+brand,model,terrain,run_type,source_url,page_is_for,weight_g,drop_mm,stack_mm
+adidas,Adizero Boston,Road,Tempo,https://www.adidas.com/us/adizero-boston-13-shoes/JS4938.html,Adizero Boston 13,,,
+adidas,Adizero Pro,Road,Race,https://www.adidas.com/us/adizero-adios-pro-4-shoes/KJ7036.html,Adizero Adios Pro 4,,,
+adidas,Adizero SL,Road,Tempo,https://www.adidas.com/us/adizero-sl2-shoes/JI2994.html,Adizero SL2,238,9,36
+adidas,Runfalcon,Road,Daily,https://www.adidas.com/us/runfalcon-5-running-shoes/IH7758.html,Runfalcon 5,,,
+adidas,Supernova,Road,Daily,https://www.adidas.co.uk/supernova-rise-2-running-shoes/JQ7699.html,Supernova Rise 2,,10,
+adidas,Terrex Agravic,Trail,Trail,https://www.adidas.co.uk/terrex-agravic-3-trail-running-shoes/ID0343.html,Terrex Agravic 3,,,
+ASICS,GEL-Cumulus,Road,Daily,https://www.asics.com/us/en-us/gel-cumulus--27/p/ANA_1011B960-101.html,GEL-CUMULUS 27,265,8,
+ASICS,GEL-Kayano,Road,Daily,https://www.asics.com/us/en-us/gel-kayano-32/p/ANA_1011C052-401.html,GEL-KAYANO 32,300,8,
+ASICS,GEL-Nimbus,Road,Daily,https://www.asics.com/ca/en-ca/gel-nimbus-27-1011b958-100,GEL-NIMBUS 27,305,8,
+ASICS,GEL-Trabuco,Trail,Daily,https://www.asics.com/gb/en-gb/gel-trabuco-13/p/1011B973-020.html,GEL-TRABUCO 13,285,8,35.5
+ASICS,GT-2000,Road,Daily,https://www.asics.com/us/en-us/gt-2000-14/p/ANA_1011C056-021.html,GT-2000 14,270,8,
+ASICS,Magic Speed,Road,Tempo,https://www.asics.com/us/en-us/magic-speed-4/p/ANA_1011B875-750.html,MAGIC SPEED 4,242,8,
+ASICS,Metaspeed Sky,Road,Race,https://www.asics.com/no/en-no/metaspeed-sky-tokyo/p/1013A162-400.html,METASPEED SKY TOKYO,170,5,39.5
+ASICS,Novablast,Road,Daily,https://www.asics.com/gb/en-gb/novablast-5/p/1011B974-002.html,NOVABLAST 5,255,8,
+Brooks,Adrenaline GTS,Road,Daily,https://www.brooksrunning.com/en_us/mens/shoes/road-running-shoes/adrenaline-gts-24/110437.html,Adrenaline GTS 24,284,12,
+Brooks,Ghost,Road,Daily,https://www.brooksrunning.com/en_us/mens/shoes/road-running-shoes/ghost-17/1104422E090.095.html,Ghost 17,286,10,
+Brooks,Glycerin,Road,Daily,https://www.brooksrunning.com/en_us/mens/shoes/road-running-shoes/glycerin-22/110445.html,Glycerin 22,289,10,
+HOKA,Bondi,Road,Daily,https://www.hoka.com/en/us/mens-everyday-running-shoes/bondi-9/1162011.html,Bondi 9,298,5,43
+HOKA,Clifton,Road,Daily,https://www.hoka.com/en/us/mens-everyday-running-gear/clifton-10/1162030.html,Clifton 10,278,8,42
+HOKA,Gaviota,Road,Daily,https://www.hoka.com/en/gb/men-road/gaviota-6/1171932.html,Gaviota 6,291,6,
+HOKA,Mach,Road,Tempo,https://www.hoka.com/en/us/men/mach-6/1147790.html,Mach 6,232,5,
+HOKA,Mafate,Trail,Trail,https://www.hoka.com/en/gb/men-trail/mafate-5/1168722.html,Mafate 5,332,8,
+HOKA,Rincon,Road,Daily,https://www.hoka.com/en/us/mens-everyday-running-shoes/rincon-4/1155130.html,Rincon 4,228,5,
+HOKA,Speedgoat,Trail,Trail,https://www.hoka.com/en/us/mens-trail/speedgoat-6/1147791.html,Speedgoat 6,278,5,
+New Balance,Fresh Foam 880,Road,Daily,https://www.newbalance.co.uk/pd/fresh-foam-x-880v15/M880V15-48603.html,Fresh Foam X 880v15,299,6,
+New Balance,Fresh Foam 1080,Road,Daily,https://www.newbalance.co.uk/pd/fresh-foam-x-1080-v14/M1080V14-47512.html,Fresh Foam X 1080v14,298,6,
+New Balance,FuelCell Rebel,Road,Tempo,https://www.newbalance.co.uk/pd/fuelcell-rebel-v5/MFCXV5-50690.html,FuelCell Rebel v5,223,6,
+New Balance,FuelCell SuperComp Elite,Road,Race,https://www.newbalance.com/pd/fuelcell-supercomp-elite-v4/MRCELV4-46422-PMG-NA.html,FuelCell SuperComp Elite v4,,,
+Nike,Alphafly,Road,Race,https://www.nike.com/t/alphafly-3-mens-road-racing-shoes-5gZBgL/II7290-100,Alphafly 3,218,8,
+Nike,Invincible,Road,Daily,https://www.nike.com/ch/en/t/invincible-3-road-running-shoes-0r1MPB,Invincible 3,309,9,
+Nike,Pegasus,Road,Daily,https://www.nike.com/gb/t/pegasus-41-road-running-shoes-SPAsRL1w,Pegasus 41,297,10,
+Nike,Pegasus Trail,Trail,Daily,https://www.nike.com/t/pegasus-trail-5-mens-trail-running-shoes-0ZrZ4D/DV3864-002,Pegasus Trail 5,300,9.5,
+Nike,Structure,Road,Daily,https://www.nike.com/gb/t/structure-26-mens-road-running-shoes-DyK0ML90,Structure 26,321,10,
+Nike,Vaporfly,Road,Race,https://www.nike.com/t/vaporfly-4-mens-road-racing-shoes-HK05JWOf,Vaporfly 4,,,
+Nike,Vomero,Road,Daily,https://www.nike.com/t/vomero-18-mens-road-running-shoes-NzWnvcC8,Vomero 18,325,10,46
+Nike,Wildhorse,Trail,Daily,https://www.nike.com/gb/t/wildhorse-10-mens-trail-running-shoes-6RHZHLQc,Wildhorse 10,311,9.5,
+Nike,Zegama,Trail,Trail,https://www.nike.com/ie/t/zegama-trail-2-trail-running-shoes-VP1Pxw,Zegama Trail 2,320,4,
+Nike,Zoom Fly,Road,Tempo,https://www.nike.com/t/zoom-fly-6-mens-road-racing-shoes-wn2ALjkm/IQ9405-411,Zoom Fly 6,265,8,
+On,Cloudboom,Road,Race,https://www.on.com/en-us/products/cloudboom-strike-ls-u-3ue3001,LightSpray Cloudboom Strike,,,
+On,Cloudmonster,Road,Daily,https://www.on.com/en-us/products/cloudmonster-2-m-3me1012/mens/black-glacier-shoes-3ME10120777,Cloudmonster 2,300,6,
+On,Cloudrunner,Road,Daily,https://www.on.com/en-us/products/cloudrunner-2-m-3me1014/mens/eclipse-black-shoes-3ME10140264,Cloudrunner 2,,,
+On,Cloudsurfer,Road,Daily,https://www.on.com/en-us/products/cloudsurfer-next-3me3002,Cloudsurfer Next,,,
+On,Cloudultra,Trail,Trail,https://www.on.com/en-us/products/cloudultra-3-m-3mf3023,Cloudultra 3,,,
+On,Cloudvista,Both,Daily,https://www.on.com/en-us/products/cloudvista-2-3me3011/mens,Cloudvista 2,,,
+PUMA,Velocity Nitro,Road,Daily,https://us.puma.com/us/en/pd/velocity-nitro-4-mens-road-running-shoes/311140,Velocity NITRO 4,,10,36
+Reebok,FloatZig,Road,Daily,https://www.reebok.com/products/reebok-mens-floatzig-1-shoes-chalk-sand-golden-haze-117470,FloatZig 1,278,6,31
+Salomon,Genesis,Trail,Trail,https://www.salomon.com/en-us/product/genesis-2-li9180,Genesis 2,,8,
+Salomon,Sense Ride,Trail,Daily,https://www.salomon.com/en-ca/product/sense-ride-5-li3121,Sense Ride 5,293,8,
+Salomon,Speedcross,Trail,Daily,https://www.salomon.com/en-us/product/speedcross-6-lg9212,Speedcross 6,312,10,
+Saucony,Endorphin Pro,Road,Race,https://www.saucony.com/UK/en_GB/endorphin-pro-4/58850M.html,Endorphin Pro 4,212,8,
+Saucony,Endorphin Speed,Road,Tempo,https://www.saucony.com/en/endorphin-speed-5/60307M.html,Endorphin Speed 5,237,,
+Saucony,Guide,Road,Daily,https://www.saucony.com/UK/en_GB/guide-18/59947M.html,Guide 18,272,6,
+Saucony,Peregrine,Trail,Daily,,(no men's page found),,,
+Saucony,Ride,Road,Daily,https://www.saucony.com/UK/en_GB/ride-18/59943M.html,Ride 18,259,8,
+Saucony,Triumph,Road,Daily,https://www.saucony.com/UK/en_GB/triumph-23/60311M.html,Triumph 23,263,10,
+Under Armour,Infinite,Road,Daily,https://www.underarmour.co.uk/en-gb/p/running/ua_infinite_elite_2_mens_running_shoes/3028169.html,UA Infinite Elite 2,290,8,36
+Under Armour,Velociti,Road,Tempo,https://www.underarmour.com/en-us/p/ua_velociti_pace_mens_running_shoes/6009107.html,UA Velociti Pace,,,

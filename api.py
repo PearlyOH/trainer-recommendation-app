@@ -17,9 +17,11 @@ from services.trainers_api import (
     init_db_pool,
     close_db_pool,
 )
+from services.catalogue_admin import router as catalogue_admin_router, ensure_schema
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_db_pool()
+    await ensure_schema()
     yield
     await close_db_pool()
 app = FastAPI(title="Trainer Recommendation API", lifespan=lifespan)
@@ -32,7 +34,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# Trainer catalogue routes (Neon-backed)
+# Trainer catalogue routes (Neon-backed). Admin tools first so /trainers/_xyz
+# paths aren't swallowed by GET /trainers/{slug}.
+app.include_router(catalogue_admin_router)
 app.include_router(trainers_router)
 app.include_router(admin_router)
 # Request model for recommendations

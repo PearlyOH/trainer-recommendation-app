@@ -24,6 +24,8 @@ Adds three tables (created on startup if missing, existing tables untouched):
 from __future__ import annotations
 
 import asyncio
+import html
+import re
 from typing import Optional
 from uuid import UUID
 
@@ -35,6 +37,7 @@ from starlette.concurrency import run_in_threadpool
 from services.trainer_rules import (
     AFFILIATE_LABEL,
     BLURB_MAX,
+    BLURB_MIN,
     REQUIRED_FOR_LIVE,
     CatalogueIndex,
     affiliate_link_required,
@@ -264,22 +267,48 @@ def _parse_row(raw: ImportRow) -> tuple[dict, list[str]]:
     return out, errors
 
 
-async def _autofill_into(row: dict, sem: asyncio.Semaphore) -> list[str]:
-    """Fill empty fields from the row's source_url. Returns names of fields filled."""
+# Page descriptions that read like shop copy rather than a line about the shoe
+_SHOP_TEXT = re.compile(r"^\s*(shop|buy)\b|free (delivery|shipping|returns)|\bat [\w.-]+\.(com|co\.uk)\b", re.I)
+
+
+def _card_blurb(description: Optional[str]) -> Optional[str]:
+    """A page description cleaned up for the trainer card, or None if unusable."""
+    if not description:
+        return None
+    text = " ".join(html.unescape(description).split())
+    if _SHOP_TEXT.search(text):
+        return None
+    if len(text) > BLURB_MAX:  # cut at the last full sentence that fits
+        cut = text[:BLURB_MAX]
+        end = max(cut.rfind(". "), cut.rfind("! "), cut.rfind("? "))
+        text = cut[: end + 1] if end >= BLURB_MIN else cut.rstrip() + "…"
+    return text if len(text) >= BLURB_MIN else None
+
+
+async def _autofill_into(row: dict, sem: asyncio.Semaphore) -> tuple[list[str], list[str]]:
+    """Fill fields from the row's source_url. Returns (fields filled, notes).
+
+    The page's own description replaces a blurb supplied in the sheet (that
+    one is the fallback); every other field is only filled when empty."""
     if not row.get("source_url"):
-        return []
+        return [], []
     async with sem:
         data = await autofill_from_url(row["source_url"])
-    filled = []
-    for src, dst in [("image", "hero_image_url"), ("description", "blurb"),
-                     ("weight_g", "weight_g"), ("drop_mm", "drop_mm"), ("stack_mm", "stack_mm")]:
+    filled, notes = [], []
+    page_blurb = _card_blurb(data.description)
+    if page_blurb:
+        row["blurb"] = page_blurb
+        filled.append("blurb")
+    elif data.description:
+        notes.append("Page description read like shop text, so the list blurb was kept"
+                     if row.get("blurb") else "Page description read like shop text, so it was skipped")
+    for src, dst in [("image", "hero_image_url"), ("weight_g", "weight_g"),
+                     ("drop_mm", "drop_mm"), ("stack_mm", "stack_mm")]:
         value = getattr(data, src)
         if value and row.get(dst) is None:
-            if dst == "blurb":
-                value = value[:BLURB_MAX]
             row[dst] = value
             filled.append(dst)
-    return filled
+    return filled, notes
 
 
 @router.post("/trainers/_import")
@@ -296,16 +325,16 @@ async def bulk_import(payload: ImportIn):
     parsed = [_parse_row(r) for r in payload.rows]
     sem = asyncio.Semaphore(4)
     autofilled = await asyncio.gather(*[
-        _autofill_into(row, sem) if payload.autofill and not errs else asyncio.sleep(0, result=[])
+        _autofill_into(row, sem) if payload.autofill and not errs else asyncio.sleep(0, result=([], []))
         for row, errs in parsed
     ])
 
     results, seen, new_brands = [], set(), set()
-    for i, ((row, errors), filled) in enumerate(zip(parsed, autofilled)):
+    for i, ((row, errors), (filled, notes)) in enumerate(zip(parsed, autofilled)):
         res = {
             "row": payload.first_row_number + i,
             "brand": row["brand"], "model": row["model"],
-            "errors": list(errors), "warnings": [], "fill": {}, "autofilled": filled,
+            "errors": list(errors), "warnings": list(notes), "fill": {}, "autofilled": filled,
         }
         results.append(res)
 

@@ -1150,6 +1150,10 @@
       const fill = Object.keys(r.fill || {});
       if (fill.length) details.push(`<div class="msg-info">${r.action === 'create' ? 'Sets' : 'Fills'}: ${esc(fill.join(', '))}</div>`);
       if (r.autofilled && r.autofilled.length) details.push(`<div class="msg-info">From source URL: ${esc(r.autofilled.join(', '))}</div>`);
+      if (r.fill && r.fill.blurb) {
+        const from = (r.autofilled || []).includes('blurb') ? 'product page' : 'your list';
+        details.push(`<div class="msg-info">Blurb (from ${from}): “${esc(r.fill.blurb)}”</div>`);
+      }
       if (r.aliases && r.aliases.length) details.push(`<div class="msg-info">Aliases: ${esc(r.aliases.join('; '))}</div>`);
       if (!dryRun && r.saved) details.push('<div class="msg-info">✓ Saved</div>');
       return `<tr>

@@ -15,9 +15,10 @@ Admin-only routes that take the manual work out of the dashboard:
 Include this router in api.py BEFORE the main trainers router, so the
 /trainers/_xyz paths win over GET /trainers/{slug}.
 
-Adds two tables (created on startup if missing, existing tables untouched):
+Adds three tables (created on startup if missing, existing tables untouched):
   trainer_aliases       alternative names (survey free text, retailer names)
   trainer_feed_matches  Awin feed products confirmed/rejected per trainer
+  trainer_sources       the product page each trainer was auto-filled from
 """
 
 from __future__ import annotations
@@ -83,6 +84,12 @@ CREATE TABLE IF NOT EXISTS trainer_feed_matches (
     UNIQUE (feed, merchant_id, feed_product_id)
 );
 CREATE INDEX IF NOT EXISTS trainer_feed_matches_trainer_id_idx ON trainer_feed_matches (trainer_id);
+
+CREATE TABLE IF NOT EXISTS trainer_sources (
+    trainer_id  UUID PRIMARY KEY REFERENCES trainers(id) ON DELETE CASCADE,
+    source_url  TEXT NOT NULL,
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 """
 
 
@@ -129,6 +136,7 @@ async def readiness():
     async with pool.acquire() as conn:
         trainers, _ = await _load_catalogue(conn)
         aliases = await conn.fetch("SELECT id, trainer_id, alias FROM trainer_aliases ORDER BY alias")
+        sources = {str(r["trainer_id"]): r["source_url"] for r in await conn.fetch("SELECT * FROM trainer_sources")}
         matches = await conn.fetch(
             "SELECT trainer_id, count(*) AS n FROM trainer_feed_matches "
             "WHERE status = 'confirmed' GROUP BY trainer_id"
@@ -149,6 +157,7 @@ async def readiness():
                 "aliases": alias_map.get(str(t["id"]), []),
                 "feed_matches": match_map.get(str(t["id"]), 0),
                 "has_affiliate_link": t["has_affiliate_link"],
+                "source_url": sources.get(str(t["id"])),
             }
             for t in trainers
         },
@@ -282,6 +291,7 @@ async def bulk_import(payload: ImportIn):
             (r["brand_id"], name_key(r["model"])): dict(r)
             for r in await conn.fetch("SELECT * FROM trainers")
         }
+        sources = {r["trainer_id"]: r["source_url"] for r in await conn.fetch("SELECT * FROM trainer_sources")}
 
     parsed = [_parse_row(r) for r in payload.rows]
     sem = asyncio.Semaphore(4)
@@ -323,13 +333,15 @@ async def bulk_import(payload: ImportIn):
         if current:
             res["trainer_id"] = str(current["id"])
             res["fill"] = {f: row[f] for f in TRAINER_FIELDS if row.get(f) is not None and current.get(f) is None}
-            res["action"] = "update" if res["fill"] or row["aliases"] else "unchanged"
+            new_source = row["source_url"] and row["source_url"] != sources.get(current["id"])
+            res["action"] = "update" if res["fill"] or row["aliases"] or new_source else "unchanged"
         else:
             res["fill"] = {f: row[f] for f in TRAINER_FIELDS if row.get(f) is not None}
             # Use the catalogue's spelling of the brand ("Adidas", not the sheet's "adidas")
             res["fill"].setdefault("display_name", f"{brand['name'] if brand else row['brand']} {row['model']}")
             res["action"] = "create"
         res["aliases"] = row["aliases"]
+        res["source_url"] = row["source_url"]
 
     if not payload.dry_run:
         await _commit_import(results, new_brands)
@@ -381,6 +393,8 @@ async def _commit_import(results: list[dict], new_brands: set[str]) -> None:
                         )
                     for alias in res.get("aliases", []):
                         await _insert_alias(conn, UUID(res["trainer_id"]), alias, "import")
+                    if res.get("source_url"):
+                        await _save_source(conn, UUID(res["trainer_id"]), res["source_url"])
                 res["saved"] = True
             except Exception as e:  # one bad row must not sink the rest
                 res["saved"] = False
@@ -397,6 +411,30 @@ async def _insert_alias(conn, trainer_id: UUID, alias: str, source: str) -> Opti
         """,
         trainer_id, alias, name_key(alias), source,
     )
+
+
+async def _save_source(conn, trainer_id: UUID, url: str) -> None:
+    await conn.execute(
+        """
+        INSERT INTO trainer_sources (trainer_id, source_url) VALUES ($1, $2)
+        ON CONFLICT (trainer_id) DO UPDATE SET source_url = EXCLUDED.source_url, updated_at = now()
+        """,
+        trainer_id, url,
+    )
+
+
+class SourceIn(BaseModel):
+    source_url: str = Field(..., pattern=r"^https?://", max_length=2000)
+
+
+@router.put("/trainers/{trainer_id}/source")
+async def set_source(trainer_id: UUID, payload: SourceIn):
+    pool = get_pool()
+    async with pool.acquire() as conn:
+        if not await conn.fetchval("SELECT 1 FROM trainers WHERE id = $1", trainer_id):
+            raise HTTPException(status_code=404, detail="Trainer not found")
+        await _save_source(conn, trainer_id, payload.source_url.strip())
+    return {"source_url": payload.source_url.strip()}
 
 
 # ---------------------------------------------------------------------------

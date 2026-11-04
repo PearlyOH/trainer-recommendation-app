@@ -492,7 +492,7 @@
     <div class="fetch-block">
       <label>Source URL (brand or retailer product page)</label>
       <div class="fetch-row">
-        <input type="text" id="f-source-url" placeholder="https://www.hoka.com/en/gb/mens-road/clifton-9/..." />
+        <input type="text" id="f-source-url" placeholder="Paste the brand or retailer product page link" />
         <button class="btn" id="fetch-btn">Auto-fill from web</button>
       </div>
       <div class="fetch-status" id="fetch-status"></div>
@@ -503,10 +503,10 @@
         <select id="f-brand-in"></select>
       </div>
       <div class="field"><label>Model *</label>
-        <input type="text" id="f-model" placeholder="Clifton 9" />
+        <input type="text" id="f-model" placeholder="e.g. Pegasus" />
       </div>
       <div class="field full"><label>Display name <span class="hint">(auto-built if blank)</span></label>
-        <input type="text" id="f-name" placeholder="HOKA Clifton 9" />
+        <input type="text" id="f-name" placeholder="Brand + model, e.g. Nike Pegasus" />
       </div>
       <div class="field"><label>Terrain</label>
         <select id="f-terrain-in"><option value="">—</option><option>Road</option><option>Trail</option><option>Both</option></select>
@@ -526,7 +526,7 @@
       </div>
       <div class="field full"><label>Hero image URL</label><input type="text" id="f-image" placeholder="https://…" /></div>
       <div class="field full"><label>Blurb <span class="hint">(short marketing line on the trainer card)</span></label>
-        <textarea id="f-blurb" placeholder="A plush, lightweight daily trainer with HOKA's signature rocker geometry…"></textarea>
+        <textarea id="f-blurb" placeholder="One or two sentences on what the shoe is for and how it feels (30–500 characters)"></textarea>
       </div>
       <div class="field"><label>Status</label>
         <select id="f-status-in"><option value="draft">Draft</option><option value="active">Active</option><option value="archived">Archived</option></select>
@@ -799,7 +799,7 @@
     const t = id ? trainers.find(x => x.id === id) : null;
     $('modal-title').textContent = id ? 'Edit trainer' : 'Add trainer';
     $('delete-btn').classList.toggle('hidden', !id);
-    $('f-source-url').value = '';
+    $('f-source-url').value = (id && readiness.trainers[id]?.source_url) || '';
     $('fetch-status').textContent = '';
     $('fetch-status').className = 'fetch-status';
     $('f-brand-in').value = t?.brand || (brands[0]?.name || '');
@@ -960,6 +960,11 @@
     }
     statusEl.textContent = 'Fetching…';
     statusEl.className = 'fetch-status';
+    if (editingId && url !== readiness.trainers[editingId]?.source_url) {
+      // Remember the page for this trainer so it's here next time
+      api(`/trainers/${editingId}/source`, { method: 'PUT', body: JSON.stringify({ source_url: url }) })
+        .then(refreshReadiness).catch(e => console.warn('Source URL not saved', e));
+    }
     try {
       const data = await api('/trainers/_autofill', {
         method: 'POST', body: JSON.stringify({ url })
@@ -976,7 +981,7 @@
       const found = Object.entries(data).filter(([k,v]) => v).map(([k]) => k);
       statusEl.textContent = found.length
         ? `Found: ${found.join(', ')}. Check & adjust before saving.`
-        : 'Nothing usable found on that page. Fill manually.';
+        : 'Nothing found — this site probably blocks automatic requests. Try a retailer page, or fill in by hand.';
       statusEl.className = 'fetch-status ' + (found.length ? 'ok' : 'err');
       updateChecklist();
     } catch (e) {

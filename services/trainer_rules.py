@@ -66,7 +66,7 @@ def missing_for_live(t: dict, has_affiliate_link: bool) -> list[str]:
 # ---------------------------------------------------------------------------
 # Run type / terrain vocabularies
 # ---------------------------------------------------------------------------
-RUN_TYPES = ["Daily", "Tempo", "Race", "Long run", "Recovery", "Trail", "Max cushion", "Stability"]
+RUN_TYPES = ["Daily", "Tempo", "Race", "Long run", "Recovery", "Trail"]
 
 # Spreadsheet "PrimaryPurpose" values -> catalogue run_type
 _RUN_TYPE_ALIASES = {
@@ -79,7 +79,10 @@ _RUN_TYPE_ALIASES = {
     "race (road)": "Race",
     "road race": "Race",
     "trail racing": "Trail",
-    "max cushion": "Max cushion",
+    # Kept as Daily so the existing run_type values stay valid; a separate
+    # tag for these can come later
+    "max cushion": "Daily",
+    "stability": "Daily",
 }
 _TERRAIN_ALIASES = {
     "road": "Road",

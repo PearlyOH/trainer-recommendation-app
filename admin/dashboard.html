@@ -516,7 +516,6 @@
           <option value="">—</option>
           <option>Daily</option><option>Tempo</option><option>Race</option>
           <option>Long run</option><option>Recovery</option><option>Trail</option>
-          <option>Max cushion</option><option>Stability</option>
         </select>
       </div>
       <div class="field"><label>Drop (mm)</label><input type="number" id="f-drop" step="0.5" /></div>
@@ -1176,6 +1175,7 @@
       const res = await fetch('/admin/seed/tally_trainer_list.csv');
       if (!res.ok) throw new Error(res.statusText);
       $('imp-text').value = await res.text();
+      $('imp-autofill').checked = true;  // the list carries a source URL per trainer
       parseImport();
     } catch (e) { toast('Could not load the Tally list', 'error'); }
   }

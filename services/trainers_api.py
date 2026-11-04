@@ -14,6 +14,7 @@ no prefix so the dashboard is at /admin.
 
 from __future__ import annotations
 
+import hmac
 import os
 import re
 from datetime import datetime
@@ -26,6 +27,8 @@ import httpx
 from fastapi import APIRouter, Depends, HTTPException, Header, Query
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, HttpUrl
+
+from services.trainer_rules import is_live, missing_for_live
 
 
 # ---------------------------------------------------------------------------
@@ -61,9 +64,13 @@ def get_pool() -> asyncpg.Pool:
 # ---------------------------------------------------------------------------
 # Auth
 # ---------------------------------------------------------------------------
-def require_admin(x_admin_key: str = Header(...)) -> None:
+def _admin_key_ok(given: Optional[str]) -> bool:
     expected = os.environ.get("ADMIN_API_KEY")
-    if not expected or x_admin_key != expected:
+    return bool(expected and given) and hmac.compare_digest(given.encode(), expected.encode())
+
+
+def require_admin(x_admin_key: str = Header(...)) -> None:
+    if not _admin_key_ok(x_admin_key):
         raise HTTPException(status_code=401, detail="Invalid admin key")
 
 
@@ -160,9 +167,26 @@ class AutofillOut(BaseModel):
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
-def _slugify(text: str) -> str:
+def slugify(text: str) -> str:
     s = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
     return s or "trainer"
+
+
+async def unique_slug(conn, base_slug: str) -> str:
+    slug = base_slug
+    for i in range(2, 50):
+        exists = await conn.fetchval("SELECT 1 FROM trainers WHERE slug = $1", slug)
+        if not exists:
+            break
+        slug = f"{base_slug}-{i}"
+    return slug
+
+
+def _reject_incomplete(missing: list[str]) -> None:
+    raise HTTPException(
+        status_code=422,
+        detail={"message": "This trainer can't go Live until these are filled in", "missing": missing},
+    )
 
 
 def _row_to_trainer(row, listings) -> TrainerOut:
@@ -229,7 +253,10 @@ async def auth_check():
     dependencies=[Depends(require_admin)],
 )
 async def autofill(payload: AutofillIn):
-    url = str(payload.url)
+    return await autofill_from_url(str(payload.url))
+
+
+async def autofill_from_url(url: str) -> AutofillOut:
     headers = {
         "User-Agent": (
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
@@ -318,10 +345,8 @@ async def list_trainers(
     include_drafts: bool = False,
     x_admin_key: Optional[str] = Header(None),
 ):
-    if include_drafts:
-        expected = os.environ.get("ADMIN_API_KEY")
-        if not expected or x_admin_key != expected:
-            raise HTTPException(status_code=401, detail="Admin key required for drafts")
+    if include_drafts and not _admin_key_ok(x_admin_key):
+        raise HTTPException(status_code=401, detail="Admin key required for drafts")
 
     where, args = [], []
     if not include_drafts:
@@ -382,17 +407,15 @@ async def get_trainer(slug: str):
 async def create_trainer(payload: TrainerCreate):
     pool = get_pool()
     display_name = payload.display_name or f"{payload.brand} {payload.model}"
-    base_slug = _slugify(display_name)
+    if is_live(payload.model_dump()):
+        missing = missing_for_live({**payload.model_dump(), "display_name": display_name}, has_affiliate_link=False)
+        if missing:
+            _reject_incomplete(missing)
     async with pool.acquire() as conn:
         brand_id = await conn.fetchval("SELECT id FROM brands WHERE name = $1", payload.brand)
         if brand_id is None:
             raise HTTPException(status_code=400, detail=f"Unknown brand: {payload.brand}")
-        slug = base_slug
-        for i in range(2, 50):
-            exists = await conn.fetchval("SELECT 1 FROM trainers WHERE slug = $1", slug)
-            if not exists:
-                break
-            slug = f"{base_slug}-{i}"
+        slug = await unique_slug(conn, slugify(display_name))
         try:
             row = await conn.fetchrow(
                 """
@@ -426,6 +449,29 @@ async def update_trainer(trainer_id: UUID, payload: TrainerUpdate):
     set_sql = ", ".join(f"{k} = ${i+2}" for i, k in enumerate(fields))
     pool = get_pool()
     async with pool.acquire() as conn:
+        current = await conn.fetchrow(
+            """
+            SELECT t.*, (t.best_price_link IS NOT NULL OR EXISTS (
+                SELECT 1 FROM trainer_listings l
+                WHERE l.trainer_id = t.id AND l.affiliate_url IS NOT NULL
+            )) AS has_affiliate_link
+            FROM trainers t WHERE t.id = $1
+            """,
+            trainer_id,
+        )
+        if not current:
+            raise HTTPException(status_code=404, detail="Trainer not found")
+        before, after = dict(current), {**dict(current), **fields}
+        if is_live(after):
+            missing = missing_for_live(after, current["has_affiliate_link"])
+            if not is_live(before):
+                newly_missing = missing  # going Live: everything must be there
+            else:
+                # Already Live: don't block fixes, only edits that blank a required field
+                old = set(missing_for_live(before, current["has_affiliate_link"]))
+                newly_missing = [m for m in missing if m not in old]
+            if newly_missing:
+                _reject_incomplete(newly_missing)
         row = await conn.fetchrow(
             f"""
             UPDATE trainers SET {set_sql}
@@ -480,3 +526,14 @@ async def admin_dashboard():
         if p.exists():
             return FileResponse(str(p))
     raise HTTPException(status_code=500, detail="dashboard.html not found")
+
+
+@admin_router.get("/admin/seed/{name}")
+async def admin_seed_file(name: str):
+    # Only plain CSV names from admin/seed — no paths
+    if not re.fullmatch(r"[a-z0-9_]+\.csv", name):
+        raise HTTPException(status_code=404, detail="Not found")
+    p = Path(__file__).parent.parent / "admin" / "seed" / name
+    if not p.exists():
+        raise HTTPException(status_code=404, detail="Not found")
+    return FileResponse(str(p), media_type="text/csv")
